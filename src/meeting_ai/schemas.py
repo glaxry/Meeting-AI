@@ -47,3 +47,61 @@ class LLMResponse(BaseModel):
     latency_seconds: float
     raw: dict[str, Any] = Field(default_factory=dict)
 
+
+class SummaryResult(BaseModel):
+    topics: list[str] = Field(default_factory=list)
+    decisions: list[str] = Field(default_factory=list)
+    follow_ups: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class TranslationResult(BaseModel):
+    source_language: str
+    target_language: str
+    segments: list[TranscriptSegment]
+    full_text: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ActionItemPriority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+class ActionItem(BaseModel):
+    assignee: str | None = None
+    task: str
+    deadline: str | None = None
+    priority: ActionItemPriority = ActionItemPriority.MEDIUM
+    source_quote: str
+
+
+class ActionItemResult(BaseModel):
+    items: list[ActionItem] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SentimentLabel(str, Enum):
+    AGREEMENT = "agreement"
+    DISAGREEMENT = "disagreement"
+    HESITATION = "hesitation"
+    TENSION = "tension"
+    NEUTRAL = "neutral"
+
+
+class SentimentSegment(BaseModel):
+    text: str
+    sentiment: SentimentLabel
+    confidence: float
+    speaker: str | None = None
+    start: float | None = None
+    end: float | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SentimentResult(BaseModel):
+    route: str
+    overall_tone: SentimentLabel
+    segments: list[SentimentSegment] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

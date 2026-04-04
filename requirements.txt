@@ -23,6 +23,7 @@ numpy<2
 scipy==1.15.3
 soundfile==0.13.1
 sympy==1.13.1
+transformers==4.53.3
 
 openai==2.30.0
 langchain-openai==1.1.12

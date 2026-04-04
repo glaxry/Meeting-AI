@@ -38,6 +38,10 @@ class MeetingAISettings(BaseSettings):
 
     huggingface_token: str | None = Field(default=None, alias="HUGGINGFACE_TOKEN")
     pyannote_model: str = Field(default="pyannote/speaker-diarization-3.1", alias="PYANNOTE_MODEL")
+    sentiment_transformer_model: str = Field(
+        default="uer/roberta-base-finetuned-jd-binary-chinese",
+        alias="SENTIMENT_TRANSFORMER_MODEL",
+    )
 
     funasr_model: str = Field(default="paraformer-zh", alias="FUNASR_MODEL")
     funasr_vad_model: str = Field(default="fsmn-vad", alias="FUNASR_VAD_MODEL")
@@ -49,6 +53,8 @@ class MeetingAISettings(BaseSettings):
     llm_timeout_seconds: float = Field(default=60.0, alias="LLM_TIMEOUT_SECONDS")
     llm_max_retries: int = Field(default=3, alias="LLM_MAX_RETRIES")
     llm_retry_backoff_seconds: float = Field(default=1.5, alias="LLM_RETRY_BACKOFF_SECONDS")
+    summary_map_reduce_threshold: int = Field(default=500, alias="SUMMARY_MAP_REDUCE_THRESHOLD")
+    summary_chunk_target_words: int = Field(default=350, alias="SUMMARY_CHUNK_TARGET_WORDS")
 
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
@@ -81,10 +87,10 @@ class MeetingAISettings(BaseSettings):
             "huggingface_token_present": bool(self.huggingface_token),
             "funasr_model": self.funasr_model,
             "pyannote_model": self.pyannote_model,
+            "sentiment_transformer_model": self.sentiment_transformer_model,
         }
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> MeetingAISettings:
     return MeetingAISettings()
-
