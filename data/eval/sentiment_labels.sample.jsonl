@@ -1,0 +1,20 @@
+{"id":"s01","speaker":"PM","text":"Yes, let's ship on Friday.","label":"agreement"}
+{"id":"s02","speaker":"FIN","text":"I agree with the revised budget.","label":"agreement"}
+{"id":"s03","speaker":"OPS","text":"That works for me and the runbook is ready.","label":"agreement"}
+{"id":"s04","speaker":"ENG","text":"No, this launch plan is too risky.","label":"disagreement"}
+{"id":"s05","speaker":"QA","text":"I don't think the timeline is realistic.","label":"disagreement"}
+{"id":"s06","speaker":"LEGAL","text":"This is not acceptable for the vendor contract.","label":"disagreement"}
+{"id":"s07","speaker":"PM","text":"Maybe we should check with QA first.","label":"hesitation"}
+{"id":"s08","speaker":"ENG","text":"I'm not sure the dashboard is ready yet.","label":"hesitation"}
+{"id":"s09","speaker":"OPS","text":"We might need another day to confirm the rollout.","label":"hesitation"}
+{"id":"s10","speaker":"PM","text":"If this slips again, the client will escalate.","label":"tension"}
+{"id":"s11","speaker":"OPS","text":"The deadline is tomorrow and we are still blocked.","label":"tension"}
+{"id":"s12","speaker":"QA","text":"This issue is urgent and the risk is growing.","label":"tension"}
+{"id":"s13","speaker":"PM","text":"The packaging sample arrived this morning.","label":"neutral"}
+{"id":"s14","speaker":"OPS","text":"We reviewed three options in the meeting.","label":"neutral"}
+{"id":"s15","speaker":"FIN","text":"The next agenda item is the pricing table.","label":"neutral"}
+{"id":"s16","speaker":"产品","text":"可以，我同意这个安排。","label":"agreement"}
+{"id":"s17","speaker":"法务","text":"不行，这个方案我不同意。","label":"disagreement"}
+{"id":"s18","speaker":"研发","text":"我觉得可能还需要再确认一下。","label":"hesitation"}
+{"id":"s19","speaker":"运营","text":"这个风险已经很高了，今天必须处理。","label":"tension"}
+{"id":"s20","speaker":"主持人","text":"我们先看一下第二页的图表。","label":"neutral"}

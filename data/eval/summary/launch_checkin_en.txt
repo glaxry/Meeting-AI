@@ -1,0 +1,7 @@
+[PM] We have a short launch check-in today.
+[QA] The regression suite finished last night and only one low-risk UI bug remains.
+[ENG] The API and the dashboard are both ready for release.
+[OPS] Vendor onboarding is complete and production monitoring has been updated.
+[PM] We will keep the Friday launch date if the UI fix is merged before noon tomorrow.
+[QA] I will send the final QA sign-off tomorrow morning.
+[OPS] I will update the rollout checklist and notify support this afternoon.

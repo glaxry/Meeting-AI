@@ -1,0 +1,33 @@
+[PM] Thanks everyone for joining the extended launch planning review for the analytics dashboard, the partner portal, and the customer support playbook.
+[PM] The goal today is to confirm scope, surface risks, agree on the release date, and assign every follow-up item before we leave.
+[ENG] Engineering completed the backend migration, the feature flags are wired, and the performance regression from last week has been resolved.
+[ENG] The open issues are a flaky export job in the staging cluster, two medium-priority UI bugs in the settings page, and missing telemetry on the pricing widget.
+[QA] QA finished the main regression suite, but exploratory testing still uncovered problems in the mobile navigation, the CSV export flow, and one onboarding tooltip.
+[QA] None of those issues block the internal demo, but they could create confusion for first-time users if we release without cleaning them up.
+[DESIGN] The updated dashboard copy is approved, the empty-state illustrations are final, and the help-center screenshots can be delivered after the release candidate is frozen.
+[SALES] The field team likes the new dashboard layout, but they want clearer messaging around role permissions and export limits before customer launch.
+[SUPPORT] Support reviewed the draft macros and noted that the documentation must explain the difference between workspace admins, analysts, and read-only reviewers.
+[OPS] Deployment automation is ready, rollback is tested, and the runbook has been updated for the new worker queue and the cache invalidation step.
+[OPS] The only infrastructure concern is that we still need final confirmation from the vendor about webhook rate limits during peak traffic.
+[PM] If the vendor confirmation arrives today and the export bug is fixed by Thursday morning, are we comfortable keeping the planned Friday release?
+[ENG] From engineering's perspective Friday still works, but only if the telemetry patch lands tonight and the export retry logic is verified in staging tomorrow.
+[QA] I agree with that condition, and I also want the mobile navigation fix merged before I sign off on the final release candidate.
+[SALES] Friday is still the preferred date because two enterprise demos are already scheduled next week and a slip would affect those conversations.
+[SUPPORT] Support can handle the timeline, but we need the final FAQ and escalation notes by Thursday afternoon so the team is not improvising answers.
+[DESIGN] The final FAQ screenshots depend on the mobile navigation fix, so design needs that patch no later than Thursday at noon.
+[PM] Understood, so the release stays on Friday if engineering closes the export and telemetry issues, QA signs off, and vendor rate-limit confirmation arrives today.
+[ENG] I will own the export retry bug and the telemetry patch, and I will post status updates in the launch channel by 3 p.m. and again by end of day.
+[QA] I will rerun exploratory testing after the fixes land and I will deliver a written sign-off by 10 a.m. on Thursday if nothing new appears.
+[OPS] I will follow up with the vendor immediately after this call and will update the runbook with the confirmed webhook limits as soon as they reply.
+[SUPPORT] I will revise the FAQ, the macro library, and the escalation notes once design sends the final screenshots and product confirms the permission wording.
+[DESIGN] I will finalize the screenshot pack and the annotated help-center assets once the mobile navigation patch is available in staging.
+[SALES] I will update the launch brief for the account team and include the current positioning around permissions, exports, and expected customer questions.
+[PM] Before we close, let's capture the main risks: vendor response timing, hidden issues in mobile navigation, and incomplete telemetry after launch.
+[ENG] Another small risk is that the pricing widget still lacks one analytics event, but that does not block launch if we create a follow-up ticket and monitor usage manually.
+[QA] I am okay with that as long as the missing event is documented and someone owns the follow-up so it does not disappear after launch week.
+[PM] That is fair, we will treat the missing analytics event as a post-launch follow-up rather than a release blocker.
+[SUPPORT] Please also remember that the customer success team requested a one-page quick-start guide for the new dashboard filters and exports.
+[DESIGN] I can draft the visual layout for that quick-start guide, but I need product marketing to provide the final copy and the approved terminology.
+[PM] I will ask product marketing for the copy today and I will review the quick-start guide tomorrow afternoon with support and design.
+[OPS] Once the release candidate is approved, operations will schedule the deployment for Friday at 9 a.m. and monitor the first two hours with engineering on standby.
+[PM] Great, the working decision is to keep the Friday release date with the stated conditions, and every owner should update the launch tracker before end of day.
