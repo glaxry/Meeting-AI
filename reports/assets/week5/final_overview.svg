@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="780" viewBox="0 0 1360 780">
+<rect width="1360" height="780" fill="#f8fafc"/>
+<text x="48" y="44" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#111827">Meeting AI Final Snapshot</text>
+<text x="48" y="74" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">This board condenses the core numbers used in the final report and demo.</text>
+<rect x="48" y="112" width="390" height="180" rx="24" fill="#dbeafe" stroke="#cbd5e1" stroke-width="2"/>
+<text x="70" y="150" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">End-to-End Runtime</text>
+<text x="70" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Audio duration: 539.905s</text>
+<text x="70" y="218" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Workflow latency: 225.154s</text>
+<text x="70" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Workflow RTF: 0.417</text>
+<text x="70" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Stored meeting id: 1e2fdea9fc3b49249cadfb10860ee78f</text>
+<rect x="484" y="112" width="390" height="180" rx="24" fill="#dcfce7" stroke="#cbd5e1" stroke-width="2"/>
+<text x="506" y="150" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">Architecture Result</text>
+<text x="506" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Parallel latency: 50.803s</text>
+<text x="506" y="218" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Serial latency: 68.093s</text>
+<text x="506" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Speedup: 1.340x</text>
+<text x="506" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Failure isolation: 3 vs 1 agents</text>
+<rect x="920" y="112" width="390" height="180" rx="24" fill="#fee2e2" stroke="#cbd5e1" stroke-width="2"/>
+<text x="942" y="150" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">Sentiment Trade-off</text>
+<text x="942" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer acc/F1: 0.750 / 0.677</text>
+<text x="942" y="218" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer latency: 0.418s</text>
+<text x="942" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM acc/F1: 1.000 / 1.000</text>
+<text x="942" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM latency: 11.267s</text>
+<rect x="48" y="330" width="1262" height="380" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="70" y="368" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">Demo Narrative</text>
+<text x="70" y="408" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">1. Upload `test.wav` in Gradio and show the transcript tab first.</text>
+<text x="70" y="436" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">2. Highlight summary / translation / action-item tabs while the audience already sees structured outputs.</text>
+<text x="70" y="464" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">3. Explain why LangGraph matters with the Week 4 architecture comparison: faster runtime plus partial results on failure.</text>
+<text x="70" y="492" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">4. Close with the Week 4 sentiment trade-off: transformer is fast, LLM is more accurate.</text>
+<text x="70" y="520" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">5. Keep `reports/final_project_report.md` open as backup evidence if the UI or API is slow.</text>
+</svg>

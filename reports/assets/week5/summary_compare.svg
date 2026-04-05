@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="520" viewBox="0 0 1320 520">
+<rect width="1320" height="520" fill="#f8fafc"/>
+<text x="48" y="44" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#111827">Summary Evaluation and Ablation</text>
+<text x="48" y="74" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">Current long-sample behavior favors the single-pass prompt over the default strategy.</text>
+<text x="360" y="108" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#111827">ROUGE-1</text>
+<text x="820" y="108" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#111827">Judge Score</text>
+<text x="48" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">default</text>
+<rect x="360" y="130" width="320" height="32" rx="12" fill="#e5e7eb"/>
+<rect x="360" y="130" width="290" height="32" rx="12" fill="#0f766e"/>
+<text x="610" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.507</text>
+<rect x="820" y="130" width="320" height="32" rx="12" fill="#e5e7eb"/>
+<rect x="820" y="130" width="251" height="32" rx="12" fill="#7c3aed"/>
+<text x="1070" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">3.667</text>
+<text x="48" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">single_pass</text>
+<rect x="360" y="200" width="320" height="32" rx="12" fill="#e5e7eb"/>
+<rect x="360" y="200" width="320" height="32" rx="12" fill="#0f766e"/>
+<text x="610" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.559</text>
+<rect x="820" y="200" width="320" height="32" rx="12" fill="#e5e7eb"/>
+<rect x="820" y="200" width="320" height="32" rx="12" fill="#7c3aed"/>
+<text x="1070" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">4.667</text>
+</svg>

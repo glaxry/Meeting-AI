@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="480" viewBox="0 0 1180 480">
+<rect width="1180" height="480" fill="#f8fafc"/>
+<text x="48" y="44" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#111827">Architecture Comparison</text>
+<text x="48" y="74" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">Parallel orchestrator versus serial baseline on the shared transcript slice.</text>
+<text x="48" y="132" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">Parallel LangGraph</text>
+<rect x="300" y="110" width="790" height="34" rx="12" fill="#e5e7eb"/>
+<rect x="300" y="110" width="589" height="34" rx="12" fill="#2563eb"/>
+<text x="905" y="132" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">50.803s</text>
+<text x="48" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">Serial Baseline</text>
+<rect x="300" y="168" width="790" height="34" rx="12" fill="#e5e7eb"/>
+<rect x="300" y="168" width="790" height="34" rx="12" fill="#2563eb"/>
+<text x="1106" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">68.093s</text>
+<text x="48" y="248" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">Failure-Isolation Agents Saved</text>
+<rect x="300" y="226" width="790" height="34" rx="12" fill="#e5e7eb"/>
+<rect x="300" y="226" width="23" height="34" rx="12" fill="#2563eb"/>
+<text x="339" y="248" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">2.000</text>
+</svg>
