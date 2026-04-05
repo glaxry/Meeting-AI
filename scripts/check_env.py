@@ -37,6 +37,7 @@ def main() -> None:
             "funasr": import_status("funasr"),
             "pyannote.audio": import_status("pyannote.audio"),
             "openai": import_status("openai"),
+            "transformers": import_status("transformers"),
         },
     }
     print(json.dumps(summary, ensure_ascii=False, indent=2))
@@ -44,4 +45,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

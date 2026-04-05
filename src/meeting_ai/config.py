@@ -39,7 +39,7 @@ class MeetingAISettings(BaseSettings):
     huggingface_token: str | None = Field(default=None, alias="HUGGINGFACE_TOKEN")
     pyannote_model: str = Field(default="pyannote/speaker-diarization-3.1", alias="PYANNOTE_MODEL")
     sentiment_transformer_model: str = Field(
-        default="uer/roberta-base-finetuned-jd-binary-chinese",
+        default="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
         alias="SENTIMENT_TRANSFORMER_MODEL",
     )
 

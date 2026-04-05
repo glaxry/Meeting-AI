@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "meeting-ai"
 version = "0.1.0"
-description = "Week 1 deliverable for the Meeting AI project."
+description = "Week 1 and Week 2 deliverables for the Meeting AI project."
 readme = "README.md"
 requires-python = ">=3.10,<3.11"
 
@@ -17,4 +17,3 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

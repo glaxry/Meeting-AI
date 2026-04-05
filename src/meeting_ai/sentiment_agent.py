@@ -98,12 +98,21 @@ def _label_from_score_name(label: str, available_labels: set[str]) -> SentimentL
     if normalized in {value.value for value in SentimentLabel}:
         return SentimentLabel(normalized)
 
-    if normalized in {"positive", "pos", "approval", "approve", "entailment"}:
+    if normalized in {"positive", "very positive", "pos", "approval", "approve", "entailment"}:
         return SentimentLabel.AGREEMENT
-    if normalized in {"negative", "neg", "contradiction"}:
+    if normalized in {"negative", "very negative", "neg", "contradiction"}:
         return SentimentLabel.DISAGREEMENT
     if normalized in {"neutral", "objective"}:
         return SentimentLabel.NEUTRAL
+
+    match = re.match(r"^(?P<stars>[1-5])\s*star[s]?$", normalized)
+    if match:
+        stars = int(match.group("stars"))
+        if stars <= 2:
+            return SentimentLabel.DISAGREEMENT
+        if stars == 3:
+            return SentimentLabel.NEUTRAL
+        return SentimentLabel.AGREEMENT
 
     if available_labels == {"label_0", "label_1"}:
         return SentimentLabel.AGREEMENT if normalized == "label_1" else SentimentLabel.DISAGREEMENT
@@ -149,13 +158,18 @@ class TransformersSentimentClassifier:
 
     def _load(self) -> Any:
         if self._classifier_pipeline is None:
-            from transformers import pipeline
+            from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
             device = 0 if self.settings.device.startswith("cuda") else -1
+            tokenizer = AutoTokenizer.from_pretrained(self.settings.sentiment_transformer_model)
+            model = AutoModelForSequenceClassification.from_pretrained(
+                self.settings.sentiment_transformer_model,
+                use_safetensors=True,
+            )
             self._classifier_pipeline = pipeline(
                 "text-classification",
-                model=self.settings.sentiment_transformer_model,
-                tokenizer=self.settings.sentiment_transformer_model,
+                model=model,
+                tokenizer=tokenizer,
                 device=device,
                 top_k=None,
                 truncation=True,

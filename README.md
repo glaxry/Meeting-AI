@@ -1,27 +1,35 @@
 # Meeting AI
 
-`Meeting AI` 的 Week 1 版本，完成了 guide.md 中第一周要求的基础环境、ASR Agent、说话人分离接入、以及 DeepSeek/Qwen 统一 LLM 调用封装。
+`Meeting AI` 目前已经完成 `guide.md` 中的 Week 1 和 Week 2：
 
-## 当前范围
+- Week 1: ASR 转录、说话人分离、统一 LLM 调用
+- Week 2: Summary / Translation / Action Item / Sentiment 四个 NLU Agent
 
-- 全新 `conda` 环境方案，Python 固定为 `3.10`
-- CUDA 版 `torch/torchaudio`，已针对 Windows + RTX 3060 调整
-- `FunASR` 负责转写，输出句级时间戳
-- `pyannote.audio 3.1.1` 负责说话人分离，按重叠时间回填说话人标签
-- `llm_tools.py` 统一封装 DeepSeek / Qwen 的 OpenAI-compatible API，并带 retry
-- `scripts/week1_demo.py` 串起 `音频 -> 转录 JSON -> LLM 调用`
+项目默认面向 Windows + CUDA + Conda 环境，LLM 走 DeepSeek 或 Qwen API，本地 GPU 主要用于 ASR、说话人分离和 `transformers` 路由。
+
+## 当前能力
+
+- `asr_agent.py`: 音频转录，输出带说话人标签的 JSON
+- `llm_tools.py`: 统一封装 DeepSeek / Qwen 的 OpenAI-compatible 接口
+- `summary_agent.py`: 会议摘要，支持长文本 `map-reduce`
+- `translation_agent.py`: 中英双向翻译，保留 `[SPEAKER]` 标签格式，支持术语表
+- `action_item_agent.py`: 提取显式和隐式待办事项
+- `sentiment_agent.py`: 双路情感分析
+  - `llm`: 5 标签分类 `agreement/disagreement/hesitation/tension/neutral`
+  - `transformer`: 本地 `transformers` 分类并归一到同一输出 schema
 
 ## 环境创建
 
-推荐直接使用本仓库的脚本：
+推荐直接使用仓库脚本：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap_week1.ps1
 conda activate meeting-ai-w1
+python -m pip install -r requirements.txt
 python -m pip install -e .
 ```
 
-如果想手动安装：
+手动创建也可以：
 
 ```powershell
 conda create -y -n meeting-ai-w1 python=3.10 pip
@@ -30,82 +38,203 @@ python -m pip install -r requirements.txt
 python -m pip install -e .
 ```
 
-## 密钥与模型访问
+## 配置
 
-### DeepSeek
+复制 `.env.example` 为 `.env`，再补齐下面几个变量：
 
-项目会按以下优先级读取 DeepSeek Key：
+```env
+DEEPSEEK_API_KEY=
+QWEN_API_KEY=
+HUGGINGFACE_TOKEN=
+```
 
-1. `.env` 中的 `DEEPSEEK_API_KEY`
-2. 环境变量 `DEEPSEEK_API_KEY`
-3. 仓库根目录的 `api-key-deepseek` 文件
+说明：
 
-### pyannote
+- DeepSeek 会按以下优先级读取 key:
+  1. `.env` 中的 `DEEPSEEK_API_KEY`
+  2. 环境变量 `DEEPSEEK_API_KEY`
+  3. 根目录 `api-key-deepseek`
+- `HUGGINGFACE_TOKEN` 用于 `pyannote` 和 `transformers` 模型下载
+- 默认 `transformers` 情感模型为 `lxyuan/distilbert-base-multilingual-cased-sentiments-student`
 
-要启用说话人分离，需要先在 Hugging Face 接受这两个模型的使用条款，然后设置 `HUGGINGFACE_TOKEN`：
-
-- `pyannote/segmentation-3.0`
-- `pyannote/speaker-diarization-3.1`
-
-没有 token 时，ASR 仍然可以跑通，但输出会退化为单说话人 `SPEAKER_00`。
-
-## 快速验证
-
-先检查环境：
+## 环境检查
 
 ```powershell
+conda activate meeting-ai-w1
 python scripts/check_env.py
 ```
 
-运行独立 ASR：
+重点看这些字段：
+
+- `cuda_available: true`
+- `settings.deepseek_key_present: true`
+- `settings.huggingface_token_present: true`
+- `imports.funasr.ok: true`
+- `imports.pyannote.audio.ok: true`
+- `imports.transformers.ok: true`
+
+## Week 1 测试
+
+运行单元测试：
 
 ```powershell
-python asr_agent.py --audio .\data\samples\demo.wav --output .\data\outputs\transcript.json --num-speakers 2
+python -m pytest -q
 ```
 
-单独调用 LLM：
+运行 ASR：
 
 ```powershell
-python llm_tools.py --provider deepseek --prompt "请用一句话总结今天的会议重点。"
+python asr_agent.py --audio .\data\samples\asr_example_zh.wav --output .\data\outputs\transcript.json --num-speakers 2
 ```
 
-跑 Week 1 端到端 demo：
+运行 LLM 连通性测试：
 
 ```powershell
-python scripts/week1_demo.py --audio .\data\samples\demo.wav --provider deepseek
+python llm_tools.py --provider deepseek --prompt "请只回复 OK"
+```
+
+运行 Week 1 demo：
+
+```powershell
+python scripts/week1_demo.py --audio .\data\samples\asr_example_zh.wav --provider deepseek --num-speakers 2
+```
+
+## Week 2 测试
+
+先准备转录 JSON。可以直接用 ASR 生成，也可以复用已有结果：
+
+```powershell
+python asr_agent.py --audio .\data\samples\asr_example_zh.wav --output .\data\outputs\transcript.json --num-speakers 2
+```
+
+摘要：
+
+```powershell
+python summary_agent.py --provider deepseek --transcript-json .\data\outputs\transcript.json --output .\data\outputs\summary.json
+```
+
+翻译：
+
+```powershell
+python translation_agent.py --provider deepseek --source-language zh --target-language en --transcript-json .\data\outputs\transcript.json --glossary 预算=budget --output .\data\outputs\translation.json
+```
+
+待办事项：
+
+```powershell
+python action_item_agent.py --provider deepseek --transcript-json .\data\outputs\transcript.json --output .\data\outputs\action_items.json
+```
+
+情感分析，LLM 路由：
+
+```powershell
+python sentiment_agent.py --route llm --provider deepseek --transcript-json .\data\outputs\transcript.json --output .\data\outputs\sentiment_llm.json
+```
+
+情感分析，`transformers` 路由：
+
+```powershell
+python sentiment_agent.py --route transformer --transcript-json .\data\outputs\transcript.json --output .\data\outputs\sentiment_transformer.json
+```
+
+一次性跑完 Week 2：
+
+```powershell
+python scripts/week2_demo.py --transcript-json .\data\outputs\transcript.json --provider deepseek --source-language zh --target-language en --translation-glossary 预算=budget --sentiment-route llm
+```
+
+## 输出 Schema
+
+摘要：
+
+```json
+{
+  "topics": [],
+  "decisions": [],
+  "follow_ups": []
+}
+```
+
+待办事项：
+
+```json
+{
+  "items": [
+    {
+      "assignee": "Alice",
+      "task": "Follow up with vendor",
+      "deadline": "tomorrow",
+      "priority": "high",
+      "source_quote": "Alice, can you follow up with the vendor tomorrow?"
+    }
+  ]
+}
+```
+
+情感分析：
+
+```json
+{
+  "route": "llm",
+  "overall_tone": "neutral",
+  "segments": [
+    {
+      "text": "We can ship it next week.",
+      "sentiment": "agreement",
+      "confidence": 0.91
+    }
+  ]
+}
 ```
 
 ## 项目结构
 
 ```text
 .
-├── asr_agent.py
-├── llm_tools.py
-├── requirements.txt
-├── environment.yml
-├── scripts
-│   ├── bootstrap_week1.ps1
-│   ├── check_env.py
-│   └── week1_demo.py
-├── src
-│   └── meeting_ai
-│       ├── __init__.py
-│       ├── asr_agent.py
-│       ├── config.py
-│       ├── llm_tools.py
-│       └── schemas.py
-└── tests
-    ├── test_asr_agent.py
-    └── test_llm_tools.py
+|-- asr_agent.py
+|-- llm_tools.py
+|-- summary_agent.py
+|-- translation_agent.py
+|-- action_item_agent.py
+|-- sentiment_agent.py
+|-- requirements.txt
+|-- environment.yml
+|-- scripts
+|   |-- bootstrap_week1.ps1
+|   |-- check_env.py
+|   |-- week1_demo.py
+|   `-- week2_demo.py
+|-- src
+|   `-- meeting_ai
+|       |-- __init__.py
+|       |-- asr_agent.py
+|       |-- llm_tools.py
+|       |-- summary_agent.py
+|       |-- translation_agent.py
+|       |-- action_item_agent.py
+|       |-- sentiment_agent.py
+|       |-- structured_llm.py
+|       |-- text_utils.py
+|       |-- config.py
+|       `-- schemas.py
+`-- tests
+    |-- conftest.py
+    |-- test_asr_agent.py
+    |-- test_llm_tools.py
+    |-- test_summary_agent.py
+    |-- test_translation_agent.py
+    |-- test_action_item_agent.py
+    `-- test_sentiment_agent.py
 ```
+
+## 已验证内容
+
+- `meeting-ai-w1` conda 环境中全量单测通过
+- Week 1 ASR + pyannote + DeepSeek 已跑通
+- Week 2 四个 Agent 都有独立 CLI 和单元测试
 
 ## 已知限制
 
-- Windows 下 `pyannote.audio` 的依赖组合比较敏感，当前仓库已经固定到可工作的版本线：
-  - `torch==2.5.1+cu121`
-  - `torchaudio==2.5.1+cu121`
-  - `pyannote.audio==3.1.1`
-  - `numpy<2`
-- 当前默认优先处理 `wav` 音频；如果要稳定处理 `mp3/m4a`，建议额外安装 FFmpeg。
-- 没有 Hugging Face token 时，无法真正跑 pyannote 说话人分离。
-
+- `pyannote.audio` 在 Windows 上对依赖版本比较敏感，当前 `requirements.txt` 已固定到可工作组合
+- `sentiment_agent.py --route transformer` 的标签来自通用分类模型再做 5 标签归一，不是专门训练的会议情绪模型
+- `wav` 文件最稳定；如果要长期处理 `mp3/m4a`，建议额外安装 FFmpeg
