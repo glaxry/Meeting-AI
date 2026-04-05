@@ -1,11 +1,12 @@
 # Meeting AI
 
-`Meeting AI` has working deliverables for Week 1, Week 2, Week 3, and the Week 3.5 progress-report milestone from `guide.md`.
+`Meeting AI` has working deliverables for Week 1, Week 2, Week 3, the Week 3.5 progress-report milestone, and the Week 4 experiment harness from `guide.md`.
 
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
 - Week 3: LangGraph orchestration, Chroma retrieval, Gradio UI
 - Week 3.5: report generation from real workflow artifacts
+- Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
 
 The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarization, transformer sentiment, and embeddings. DeepSeek or Qwen is used for LLM tasks.
 
@@ -19,6 +20,8 @@ The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarizati
 - `orchestrator.py`: Week 3 LangGraph workflow
 - `src/meeting_ai/retrieval.py`: Chroma + sentence-transformers retrieval
 - `src/meeting_ai/reporting.py`: Week 3.5 report and SVG asset generation
+- `src/meeting_ai/evaluation.py`: shared evaluation metrics for Week 4
+- `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
 - `ui/app.py`: Gradio interface for end-to-end runs
 
 ## Environment Setup
@@ -118,7 +121,7 @@ python -m pytest -q
 Expected:
 
 ```text
-19 passed
+33 passed
 ```
 
 ## Week 1 Quick Test
@@ -194,6 +197,25 @@ This writes:
 - `reports\assets\week3_5\output_snapshot.svg`
 - `reports\assets\week3_5\retrieval_example.svg`
 
+## Week 4 Evaluation
+
+Run the four Week 4 experiment scripts:
+
+```powershell
+python scripts/week4_asr_eval.py --manifest .\data\eval\asr_manifest.sample.jsonl --output .\reports\week4\asr_eval.json
+python scripts/week4_summary_eval.py --manifest .\data\eval\summary_manifest.sample.jsonl --provider deepseek --judge-provider deepseek --output .\reports\week4\summary_eval.json
+python scripts/week4_architecture_eval.py --workflow-json .\data\outputs\week3_test_run.json --provider deepseek --target-language en --sentiment-route transformer --max-segments 80 --output .\reports\week4\architecture_eval.json
+python scripts/week4_sentiment_eval.py --manifest .\data\eval\sentiment_labels.sample.jsonl --provider deepseek --output .\reports\week4\sentiment_eval.json
+```
+
+Generated files:
+
+- `reports\week4\asr_eval.json`
+- `reports\week4\summary_eval.json`
+- `reports\week4\architecture_eval.json`
+- `reports\week4\sentiment_eval.json`
+- `reports\week4_experiments.md`
+
 ## Important Files
 
 ```text
@@ -211,6 +233,10 @@ This writes:
 |   |-- week1_demo.py
 |   |-- week2_demo.py
 |   |-- week3_demo.py
+|   |-- week4_asr_eval.py
+|   |-- week4_summary_eval.py
+|   |-- week4_architecture_eval.py
+|   |-- week4_sentiment_eval.py
 |   `-- week35_report.py
 |-- src
 |   `-- meeting_ai
@@ -221,11 +247,14 @@ This writes:
 |       |-- sentiment_agent.py
 |       |-- orchestrator.py
 |       |-- retrieval.py
+|       |-- evaluation.py
+|       |-- baseline.py
 |       |-- reporting.py
 |       |-- runtime.py
 |       |-- config.py
 |       `-- schemas.py
 |-- reports
+|   |-- week4_experiments.md
 |   |-- week3_5_progress_report.md
 |   `-- assets
 |       `-- week3_5
@@ -235,6 +264,8 @@ This writes:
 |   |-- test_translation_agent.py
 |   |-- test_action_item_agent.py
 |   |-- test_sentiment_agent.py
+|   |-- test_baseline.py
+|   |-- test_evaluation.py
 |   |-- test_reporting.py
 |   |-- test_retrieval.py
 |   `-- test_orchestrator.py

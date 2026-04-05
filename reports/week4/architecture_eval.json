@@ -1,0 +1,23 @@
+{
+  "provider": "deepseek",
+  "runtime_compare": {
+    "transcript_segment_count": 80,
+    "parallel_latency_seconds": 50.803,
+    "serial_latency_seconds": 68.093,
+    "latency_delta_seconds": 17.29,
+    "speedup": 1.340334,
+    "parallel_errors": {},
+    "serial_errors": {}
+  },
+  "error_isolation_demo": {
+    "failure_agent": "translation",
+    "parallel_completed_agents": 3,
+    "serial_completed_agents": 1,
+    "parallel_errors": {
+      "translation": "Injected translation failure for architecture evaluation."
+    },
+    "serial_errors": {
+      "translation": "Injected translation failure for architecture evaluation."
+    }
+  }
+}

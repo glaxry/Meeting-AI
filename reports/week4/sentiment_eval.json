@@ -1,0 +1,164 @@
+{
+  "manifest": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\eval\\sentiment_labels.sample.jsonl",
+  "label_space": [
+    "agreement",
+    "disagreement",
+    "hesitation",
+    "tension",
+    "neutral"
+  ],
+  "routes": {
+    "transformer": {
+      "route": "transformer",
+      "sample_count": 20,
+      "accuracy": 0.75,
+      "macro_f1": 0.676883,
+      "per_label": {
+        "agreement": {
+          "precision": 0.571429,
+          "recall": 1.0,
+          "f1": 0.727273,
+          "support": 4
+        },
+        "disagreement": {
+          "precision": 0.666667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "support": 4
+        },
+        "hesitation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "tension": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.857143,
+          "support": 4
+        },
+        "neutral": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        }
+      },
+      "confusion_matrix": {
+        "agreement": {
+          "agreement": 4,
+          "disagreement": 0,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 0
+        },
+        "disagreement": {
+          "agreement": 0,
+          "disagreement": 4,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 0
+        },
+        "hesitation": {
+          "agreement": 0,
+          "disagreement": 0,
+          "hesitation": 4,
+          "tension": 0,
+          "neutral": 0
+        },
+        "tension": {
+          "agreement": 0,
+          "disagreement": 1,
+          "hesitation": 0,
+          "tension": 3,
+          "neutral": 0
+        },
+        "neutral": {
+          "agreement": 3,
+          "disagreement": 1,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 0
+        }
+      },
+      "latency_seconds": 0.418
+    },
+    "llm_deepseek": {
+      "route": "llm_deepseek",
+      "sample_count": 20,
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "per_label": {
+        "agreement": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "disagreement": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "hesitation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "tension": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        },
+        "neutral": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 4
+        }
+      },
+      "confusion_matrix": {
+        "agreement": {
+          "agreement": 4,
+          "disagreement": 0,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 0
+        },
+        "disagreement": {
+          "agreement": 0,
+          "disagreement": 4,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 0
+        },
+        "hesitation": {
+          "agreement": 0,
+          "disagreement": 0,
+          "hesitation": 4,
+          "tension": 0,
+          "neutral": 0
+        },
+        "tension": {
+          "agreement": 0,
+          "disagreement": 0,
+          "hesitation": 0,
+          "tension": 4,
+          "neutral": 0
+        },
+        "neutral": {
+          "agreement": 0,
+          "disagreement": 0,
+          "hesitation": 0,
+          "tension": 0,
+          "neutral": 4
+        }
+      },
+      "latency_seconds": 11.267
+    }
+  }
+}

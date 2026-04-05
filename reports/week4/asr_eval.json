@@ -1,0 +1,49 @@
+{
+  "manifest": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\eval\\asr_manifest.sample.jsonl",
+  "models": {
+    "paraformer-zh": {
+      "model": "paraformer-zh",
+      "sample_count": 1,
+      "success_count": 1,
+      "mean_wer": 0.0,
+      "mean_cer": 0.0,
+      "mean_rtf": 0.423112,
+      "samples": [
+        {
+          "id": "asr_example_zh",
+          "audio_path": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\samples\\asr_example_zh.wav",
+          "reference_text": "欢迎大家来体验达摩院推出的语音识别模型。",
+          "hypothesis_text": "欢迎大家来体验达摩院推出的语音识别模型。",
+          "wer": 0.0,
+          "cer": 0.0,
+          "audio_duration_seconds": 5.547,
+          "asr_runtime_seconds": 2.347,
+          "rtf": 0.423112,
+          "warnings": []
+        }
+      ]
+    },
+    "iic/SenseVoiceSmall": {
+      "model": "iic/SenseVoiceSmall",
+      "sample_count": 1,
+      "success_count": 1,
+      "mean_wer": 0.05,
+      "mean_cer": 0.05,
+      "mean_rtf": 0.034794,
+      "samples": [
+        {
+          "id": "asr_example_zh",
+          "audio_path": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\samples\\asr_example_zh.wav",
+          "reference_text": "欢迎大家来体验达摩院推出的语音识别模型。",
+          "hypothesis_text": "欢迎大家来体验达摩院推出的语音识别模型",
+          "wer": 0.05,
+          "cer": 0.05,
+          "audio_duration_seconds": 5.547,
+          "asr_runtime_seconds": 0.193,
+          "rtf": 0.034794,
+          "warnings": []
+        }
+      ]
+    }
+  }
+}

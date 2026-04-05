@@ -1,0 +1,387 @@
+{
+  "manifest": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\eval\\summary_manifest.sample.jsonl",
+  "provider": "deepseek",
+  "judge_provider": "deepseek",
+  "strategies": {
+    "default": {
+      "strategy": "default",
+      "provider": "deepseek",
+      "sample_count": 3,
+      "mean_rouge1": 0.507366,
+      "mean_rouge2": 0.279979,
+      "mean_rougeL": 0.432679,
+      "mean_judge_overall": 3.666667,
+      "samples": [
+        {
+          "id": "damo_intro_zh",
+          "language": "zh",
+          "word_count": 20,
+          "actual_strategy": "single_pass",
+          "chunk_count": 1,
+          "reference_summary": {
+            "topics": [
+              "达摩院语音识别模型介绍"
+            ],
+            "decisions": [],
+            "follow_ups": []
+          },
+          "candidate_summary": {
+            "topics": [
+              "Introduction to the voice recognition model from DAMO Academy"
+            ],
+            "decisions": [],
+            "follow_ups": []
+          },
+          "rouge": {
+            "rouge1": 0.470588,
+            "rouge2": 0.266667,
+            "rougeL": 0.470588
+          },
+          "judge": {
+            "overall": 5,
+            "faithfulness": 5,
+            "coverage": 5,
+            "conciseness": 5,
+            "justification": "The candidate summary accurately reflects the transcript's introduction to the voice recognition model, matches the reference summary's topics, and is concise without missing key content."
+          },
+          "judge_latency_seconds": 1.84
+        },
+        {
+          "id": "launch_checkin_en",
+          "language": "en",
+          "word_count": 86,
+          "actual_strategy": "single_pass",
+          "chunk_count": 1,
+          "reference_summary": {
+            "topics": [
+              "Launch readiness review",
+              "QA status and remaining UI fix",
+              "Operations rollout checklist"
+            ],
+            "decisions": [
+              "Keep the Friday launch date if the final UI fix lands before noon tomorrow"
+            ],
+            "follow_ups": [
+              "QA sends final sign-off tomorrow morning",
+              "Operations updates the rollout checklist and notifies support this afternoon"
+            ]
+          },
+          "candidate_summary": {
+            "topics": [
+              "Launch check-in",
+              "Regression suite results",
+              "UI bug status",
+              "API and dashboard readiness",
+              "Vendor onboarding",
+              "Production monitoring",
+              "Launch date decision",
+              "QA sign-off timing",
+              "Rollout checklist update"
+            ],
+            "decisions": [
+              "Keep Friday launch date if UI fix is merged before noon tomorrow"
+            ],
+            "follow_ups": [
+              "Merge UI fix before noon tomorrow",
+              "Send final QA sign-off tomorrow morning",
+              "Update rollout checklist and notify support this afternoon"
+            ]
+          },
+          "rouge": {
+            "rouge1": 0.684685,
+            "rouge2": 0.40367,
+            "rougeL": 0.594595
+          },
+          "judge": {
+            "overall": 4,
+            "faithfulness": 5,
+            "coverage": 4,
+            "conciseness": 3,
+            "justification": "The candidate summary is factually accurate (faithfulness=5) and covers all key topics, decisions, and follow-ups from the transcript (coverage=4). However, it is overly detailed with 9 topics listed, making it less concise than the reference summary (conciseness=3). The overall score of 4 reflects its completeness but acknowledges room for improvement in brevity."
+          },
+          "judge_latency_seconds": 3.157
+        },
+        {
+          "id": "product_launch_long_en",
+          "language": "en",
+          "word_count": 825,
+          "actual_strategy": "map_reduce",
+          "chunk_count": 3,
+          "reference_summary": {
+            "topics": [
+              "Product launch readiness for the analytics dashboard and partner portal",
+              "Open engineering, QA, and infrastructure risks",
+              "Support, sales, and documentation preparation"
+            ],
+            "decisions": [
+              "Keep the Friday release date if engineering closes the export and telemetry issues, QA signs off, and the vendor confirms webhook limits",
+              "Treat the missing pricing-widget analytics event as a post-launch follow-up instead of a release blocker"
+            ],
+            "follow_ups": [
+              "Engineering fixes the export retry bug and telemetry patch and posts status updates today",
+              "QA reruns exploratory testing and delivers written sign-off by Thursday 10 a.m.",
+              "Operations confirms vendor webhook rate limits and updates the runbook",
+              "Support revises the FAQ, macros, and escalation notes after screenshots and wording are final",
+              "Product requests final quick-start guide copy from product marketing and reviews the guide tomorrow"
+            ]
+          },
+          "candidate_summary": {
+            "topics": [
+              "analytics dashboard launch planning",
+              "partner portal launch planning",
+              "customer support playbook launch planning",
+              "scope confirmation",
+              "risk identification",
+              "release date agreement",
+              "follow-up assignment",
+              "engineering status updates",
+              "QA testing results",
+              "design approvals",
+              "sales feedback",
+              "support documentation review",
+              "operations deployment readiness",
+              "vendor confirmation requirements",
+              "release date preference",
+              "support preparation timeline",
+              "design dependencies",
+              "release conditions",
+              "engineering bug fixes",
+              "QA testing schedule",
+              "documentation updates",
+              "launch risks",
+              "missing analytics event as post-launch follow-up",
+              "quick-start guide for new dashboard filters and exports",
+              "release candidate deployment scheduling"
+            ],
+            "decisions": [
+              "Engineering completed backend migration, feature flag wiring, and performance regression resolution",
+              "Updated dashboard copy is approved",
+              "Empty-state illustrations are final",
+              "Deployment automation is ready",
+              "Rollback is tested",
+              "Runbook has been updated for new worker queue and cache invalidation step",
+              "Release stays on Friday if engineering closes export and telemetry issues, QA signs off, and vendor rate-limit confirmation arrives today",
+              "Support needs final FAQ and escalation notes by Thursday afternoon",
+              "Design needs mobile navigation patch by Thursday at noon for final FAQ screenshots",
+              "Engineering will own export retry bug and telemetry patch",
+              "QA will deliver written sign-off by 10 a.m. on Thursday if no new issues appear",
+              "Missing pricing widget analytics event does not block launch if follow-up ticket is created",
+              "Treat missing analytics event as post-launch follow-up, not a release blocker",
+              "Keep Friday release date with conditions: deployment at 9 a.m., monitoring with engineering on standby",
+              "Every owner to update launch tracker before end of day"
+            ],
+            "follow_ups": [
+              "Fix flaky export job in staging cluster",
+              "Resolve two medium-priority UI bugs in settings page",
+              "Add missing telemetry on pricing widget",
+              "Address mobile navigation issues",
+              "Fix CSV export flow problems",
+              "Resolve onboarding tooltip issue",
+              "Deliver help-center screenshots after release candidate is frozen",
+              "Create clearer messaging around role permissions and export limits before customer launch",
+              "Document difference between workspace admins, analysts, and read-only reviewers",
+              "Obtain final vendor confirmation about webhook rate limits during peak traffic",
+              "Apply telemetry patch tonight",
+              "Verify export retry logic in staging tomorrow",
+              "Merge mobile navigation fix before final release candidate sign-off",
+              "Engineering to post status updates in launch channel by 3 p.m. and end of day",
+              "Ops to follow up with vendor immediately after call and update runbook with confirmed webhook limits",
+              "Support to revise FAQ, macro library, and escalation notes once design sends final screenshots and product confirms permission wording",
+              "Design to finalize screenshot pack and annotated help-center assets once mobile navigation patch is available in staging",
+              "Sales to update launch brief for account team with positioning around permissions, exports, and customer questions",
+              "Document missing pricing widget analytics event and assign owner for follow-up ticket",
+              "PM to ask product marketing for copy for quick-start guide today",
+              "PM to review quick-start guide tomorrow afternoon with support and design",
+              "Operations to schedule deployment for Friday at 9 a.m. once release candidate approved",
+              "Monitor deployment for first two hours with engineering on standby"
+            ]
+          },
+          "rouge": {
+            "rouge1": 0.366826,
+            "rouge2": 0.1696,
+            "rougeL": 0.232855
+          },
+          "judge": {
+            "overall": 2,
+            "faithfulness": 3,
+            "coverage": 4,
+            "conciseness": 1,
+            "justification": "The candidate summary has high coverage by listing many details from the transcript, but it lacks conciseness by being overly verbose and including minor items. Faithfulness is moderate as it accurately reflects the transcript but includes some misinterpretations, such as listing engineering completions as decisions rather than status updates. Overall usefulness is low due to poor organization and excessive length, making it less practical for quick reference."
+          },
+          "judge_latency_seconds": 3.338
+        }
+      ]
+    },
+    "single_pass": {
+      "strategy": "single_pass",
+      "provider": "deepseek",
+      "sample_count": 3,
+      "mean_rouge1": 0.55852,
+      "mean_rouge2": 0.306579,
+      "mean_rougeL": 0.490304,
+      "mean_judge_overall": 4.666667,
+      "samples": [
+        {
+          "id": "damo_intro_zh",
+          "language": "zh",
+          "word_count": 20,
+          "actual_strategy": "single_pass",
+          "chunk_count": 1,
+          "reference_summary": {
+            "topics": [
+              "达摩院语音识别模型介绍"
+            ],
+            "decisions": [],
+            "follow_ups": []
+          },
+          "candidate_summary": {
+            "topics": [
+              "Introduction to the voice recognition model from DAMO Academy"
+            ],
+            "decisions": [],
+            "follow_ups": []
+          },
+          "rouge": {
+            "rouge1": 0.470588,
+            "rouge2": 0.266667,
+            "rougeL": 0.470588
+          },
+          "judge": {
+            "overall": 5,
+            "faithfulness": 5,
+            "coverage": 5,
+            "conciseness": 5,
+            "justification": "The candidate summary accurately reflects the transcript's introduction to the voice recognition model, matches the reference summary's topics, and is concise without missing key content."
+          },
+          "judge_latency_seconds": 2.33
+        },
+        {
+          "id": "launch_checkin_en",
+          "language": "en",
+          "word_count": 86,
+          "actual_strategy": "single_pass",
+          "chunk_count": 1,
+          "reference_summary": {
+            "topics": [
+              "Launch readiness review",
+              "QA status and remaining UI fix",
+              "Operations rollout checklist"
+            ],
+            "decisions": [
+              "Keep the Friday launch date if the final UI fix lands before noon tomorrow"
+            ],
+            "follow_ups": [
+              "QA sends final sign-off tomorrow morning",
+              "Operations updates the rollout checklist and notifies support this afternoon"
+            ]
+          },
+          "candidate_summary": {
+            "topics": [
+              "Launch check-in",
+              "Regression suite results",
+              "UI bug status",
+              "API and dashboard readiness",
+              "Vendor onboarding",
+              "Production monitoring",
+              "Launch date decision",
+              "QA sign-off timing",
+              "Rollout checklist update"
+            ],
+            "decisions": [
+              "Keep Friday launch date if UI fix is merged before noon tomorrow"
+            ],
+            "follow_ups": [
+              "Merge UI fix before noon tomorrow",
+              "Send final QA sign-off tomorrow morning",
+              "Update rollout checklist and notify support this afternoon"
+            ]
+          },
+          "rouge": {
+            "rouge1": 0.684685,
+            "rouge2": 0.40367,
+            "rougeL": 0.594595
+          },
+          "judge": {
+            "overall": 4,
+            "faithfulness": 5,
+            "coverage": 4,
+            "conciseness": 3,
+            "justification": "The candidate summary is factually accurate and covers all key points, but it is overly detailed in topics and includes a follow-up (merge UI fix) that is actually a decision condition, making it less concise than ideal."
+          },
+          "judge_latency_seconds": 2.664
+        },
+        {
+          "id": "product_launch_long_en",
+          "language": "en",
+          "word_count": 825,
+          "actual_strategy": "single_pass",
+          "chunk_count": 1,
+          "reference_summary": {
+            "topics": [
+              "Product launch readiness for the analytics dashboard and partner portal",
+              "Open engineering, QA, and infrastructure risks",
+              "Support, sales, and documentation preparation"
+            ],
+            "decisions": [
+              "Keep the Friday release date if engineering closes the export and telemetry issues, QA signs off, and the vendor confirms webhook limits",
+              "Treat the missing pricing-widget analytics event as a post-launch follow-up instead of a release blocker"
+            ],
+            "follow_ups": [
+              "Engineering fixes the export retry bug and telemetry patch and posts status updates today",
+              "QA reruns exploratory testing and delivers written sign-off by Thursday 10 a.m.",
+              "Operations confirms vendor webhook rate limits and updates the runbook",
+              "Support revises the FAQ, macros, and escalation notes after screenshots and wording are final",
+              "Product requests final quick-start guide copy from product marketing and reviews the guide tomorrow"
+            ]
+          },
+          "candidate_summary": {
+            "topics": [
+              "Analytics dashboard launch planning",
+              "Backend migration completion",
+              "Open engineering issues (export job, UI bugs, telemetry)",
+              "QA testing results (mobile navigation, CSV export, onboarding)",
+              "Design assets status (dashboard copy, illustrations, screenshots)",
+              "Sales feedback on messaging (permissions, export limits)",
+              "Support documentation needs (macros, role explanations)",
+              "Deployment automation readiness",
+              "Vendor webhook rate limit confirmation",
+              "Release date decision",
+              "Risk identification",
+              "Post-launch follow-up items"
+            ],
+            "decisions": [
+              "Keep the planned Friday release date if conditions are met: export bug fixed by Thursday morning, telemetry patch lands tonight, export retry logic verified, QA signs off, vendor rate-limit confirmation arrives today",
+              "Treat missing analytics event on pricing widget as a post-launch follow-up rather than a release blocker"
+            ],
+            "follow_ups": [
+              "ENG: Fix export retry bug and telemetry patch, post status updates by 3 p.m. and end of day",
+              "QA: Rerun exploratory testing after fixes, deliver written sign-off by 10 a.m. Thursday",
+              "OPS: Follow up with vendor on webhook rate limits, update runbook with confirmed limits",
+              "SUPPORT: Revise FAQ, macro library, and escalation notes after design sends final screenshots and product confirms permission wording",
+              "DESIGN: Finalize screenshot pack and annotated help-center assets after mobile navigation patch is available in staging",
+              "SALES: Update launch brief for account team with positioning on permissions, exports, and customer questions",
+              "PM: Ask product marketing for quick-start guide copy, review guide tomorrow afternoon with support and design",
+              "All owners: Update launch tracker before end of day",
+              "Post-launch: Create follow-up ticket for missing analytics event on pricing widget, monitor usage manually",
+              "Post-launch: Develop one-page quick-start guide for new dashboard filters and exports",
+              "OPS: Schedule deployment for Friday at 9 a.m., monitor first two hours with engineering on standby"
+            ]
+          },
+          "rouge": {
+            "rouge1": 0.520286,
+            "rouge2": 0.2494,
+            "rougeL": 0.405728
+          },
+          "judge": {
+            "overall": 5,
+            "faithfulness": 5,
+            "coverage": 5,
+            "conciseness": 4,
+            "justification": "The candidate summary is highly faithful to the transcript, accurately capturing all factual details without errors. It provides comprehensive coverage of key topics, decisions, and follow-ups, including all major points from the reference summary and additional relevant details. While it is slightly less concise due to its thoroughness, it remains well-structured and clear, making it highly useful overall."
+          },
+          "judge_latency_seconds": 3.352
+        }
+      ]
+    }
+  }
+}
