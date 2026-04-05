@@ -68,6 +68,16 @@ class MeetingOrchestrator:
         self.vector_store = vector_store or MeetingVectorStore(self.settings)
         self.graph = self._build_graph().compile()
 
+    def _configure_provider(self, provider: LLMProvider) -> None:
+        for agent in [
+            self.summary_agent,
+            self.translation_agent,
+            self.action_item_agent,
+            self.sentiment_agent,
+        ]:
+            if hasattr(agent, "provider"):
+                agent.provider = provider
+
     def _build_graph(self) -> StateGraph:
         workflow = StateGraph(WorkflowState)
         workflow.add_node("asr", self._asr_node)
@@ -192,6 +202,7 @@ class MeetingOrchestrator:
         persist_summary: bool = True,
     ) -> MeetingWorkflowResult:
         started = time.perf_counter()
+        self._configure_provider(provider)
         state: WorkflowState = {
             "audio_path": str(Path(audio_path).expanduser().resolve()),
             "language": language,

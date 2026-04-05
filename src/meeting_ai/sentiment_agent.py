@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -237,7 +238,9 @@ class TransformersSentimentClassifier:
 
     def classify_segments(self, segments: list[TranscriptSegment]) -> tuple[list[SentimentSegment], dict[str, Any]]:
         classifier = self._load()
+        started = time.perf_counter()
         outputs = classifier([segment.text for segment in segments])
+        elapsed = round(time.perf_counter() - started, 3)
         sentiment_segments: list[SentimentSegment] = []
 
         for segment, output in zip(segments, outputs):
@@ -279,6 +282,7 @@ class TransformersSentimentClassifier:
         return sentiment_segments, {
             "classifier_model": self.settings.sentiment_transformer_model,
             "device": self.settings.device,
+            "latency_seconds": elapsed,
         }
 
 

@@ -5,6 +5,7 @@ from meeting_ai.schemas import (
     ActionItem,
     ActionItemResult,
     ActionItemPriority,
+    LLMProvider,
     RetrievalRecord,
     SentimentLabel,
     SentimentResult,
@@ -35,11 +36,22 @@ class FakeASR:
 
 
 class FakeSummaryAgent:
+    def __init__(self):
+        self.provider = LLMProvider.DEEPSEEK
+
     def summarize(self, **kwargs):
-        return SummaryResult(topics=["Launch"], decisions=["Ship next Tuesday"], follow_ups=["Send plan"])
+        return SummaryResult(
+            topics=["Launch"],
+            decisions=["Ship next Tuesday"],
+            follow_ups=["Send plan"],
+            metadata={"provider": self.provider.value},
+        )
 
 
 class FakeTranslationAgent:
+    def __init__(self):
+        self.provider = LLMProvider.DEEPSEEK
+
     def translate(self, **kwargs):
         transcript = kwargs["transcript"]
         return TranslationResult(
@@ -47,16 +59,22 @@ class FakeTranslationAgent:
             target_language="zh",
             segments=transcript.segments,
             full_text=transcript.full_text,
-            metadata={},
+            metadata={"provider": self.provider.value},
         )
 
 
 class BrokenTranslationAgent:
+    def __init__(self):
+        self.provider = LLMProvider.DEEPSEEK
+
     def translate(self, **kwargs):
         raise RuntimeError("translation failed")
 
 
 class FakeActionItemAgent:
+    def __init__(self):
+        self.provider = LLMProvider.DEEPSEEK
+
     def extract(self, **kwargs):
         return ActionItemResult(
             items=[
@@ -67,11 +85,15 @@ class FakeActionItemAgent:
                     priority=ActionItemPriority.HIGH,
                     source_quote="Please ship next Tuesday.",
                 )
-            ]
+            ],
+            metadata={"provider": self.provider.value},
         )
 
 
 class FakeSentimentAgent:
+    def __init__(self):
+        self.provider = LLMProvider.DEEPSEEK
+
     def analyze(self, **kwargs):
         return SentimentResult(
             route="llm",
@@ -84,6 +106,7 @@ class FakeSentimentAgent:
                     speaker="SPEAKER_00",
                 )
             ],
+            metadata={"provider": self.provider.value},
         )
 
 
@@ -148,3 +171,30 @@ def test_orchestrator_isolates_agent_errors() -> None:
     assert result.sentiment is not None
     assert result.translation is None
     assert "translation" in result.errors
+
+
+def test_orchestrator_propagates_provider_to_agents() -> None:
+    store = FakeStore()
+    summary_agent = FakeSummaryAgent()
+    translation_agent = FakeTranslationAgent()
+    action_item_agent = FakeActionItemAgent()
+    sentiment_agent = FakeSentimentAgent()
+    orchestrator = MeetingOrchestrator(
+        asr_agent=FakeASR(),
+        summary_agent=summary_agent,
+        translation_agent=translation_agent,
+        action_item_agent=action_item_agent,
+        sentiment_agent=sentiment_agent,
+        vector_store=store,
+    )
+
+    result = orchestrator.run(
+        audio_path="demo.wav",
+        provider=LLMProvider.QWEN,
+        selected_agents=["summary", "translation", "action_items", "sentiment"],
+    )
+
+    assert result.summary.metadata["provider"] == "qwen"
+    assert result.translation.metadata["provider"] == "qwen"
+    assert result.action_items.metadata["provider"] == "qwen"
+    assert result.sentiment.metadata["provider"] == "qwen"

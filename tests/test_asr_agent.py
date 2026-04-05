@@ -1,6 +1,13 @@
 from __future__ import annotations
 
-from meeting_ai.asr_agent import assign_speakers, normalize_sentence_info
+from meeting_ai.asr_agent import (
+    _funasr_generate_kwargs,
+    _funasr_model_kwargs,
+    _sensevoice_language_hint,
+    assign_speakers,
+    normalize_sentence_info,
+)
+from meeting_ai.config import get_settings
 from meeting_ai.schemas import DiarizationSegment
 
 
@@ -37,3 +44,29 @@ def test_assign_speakers_prefers_overlap() -> None:
     assert assigned[0].speaker == "SPEAKER_A"
     assert assigned[1].speaker == "SPEAKER_B"
 
+
+def test_sensevoice_helpers_switch_remote_code_and_language() -> None:
+    settings = get_settings().model_copy(update={"funasr_model": "iic/SenseVoiceSmall"})
+
+    model_kwargs = _funasr_model_kwargs(settings)
+    generate_kwargs = _funasr_generate_kwargs(settings, "zh")
+
+    assert model_kwargs["trust_remote_code"] is True
+    assert "punc_model" not in model_kwargs
+    assert generate_kwargs["language"] == "zn"
+    assert generate_kwargs["use_itn"] is False
+
+
+def test_sensevoice_language_hint_defaults_to_auto() -> None:
+    assert _sensevoice_language_hint("fr") == "auto"
+
+
+def test_normalize_sentence_info_strips_sensevoice_control_tokens() -> None:
+    segments = normalize_sentence_info(
+        [
+            {"text": "<|zh|><|NEUTRAL|><|Speech|><|woitn|>欢迎大家", "start": 0, "end": 1000},
+        ],
+        audio_duration=1.0,
+    )
+
+    assert segments[0].text == "欢迎大家"

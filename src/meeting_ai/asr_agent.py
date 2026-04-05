@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,7 @@ from .schemas import DiarizationSegment, TranscriptResult, TranscriptSegment
 
 
 LOGGER = logging.getLogger(__name__)
+_CONTROL_TOKEN_PATTERN = re.compile(r"<\|[^|]+?\|>")
 
 
 def _setup_logging() -> None:
@@ -27,6 +29,55 @@ def get_audio_duration(audio_path: Path) -> float:
     return float(sf.info(str(audio_path)).duration)
 
 
+def _uses_sensevoice_model(model_name: str) -> bool:
+    return "sensevoice" in model_name.strip().lower()
+
+
+def _sensevoice_language_hint(language: str) -> str:
+    normalized = language.strip().lower()
+    if normalized in {"zh", "zh-cn", "zh_cn", "cn", "中文", "chinese"}:
+        return "zn"
+    if normalized in {"en", "english"}:
+        return "en"
+    return "auto"
+
+
+def _funasr_model_kwargs(settings: MeetingAISettings) -> dict[str, Any]:
+    kwargs: dict[str, Any] = {
+        "model": settings.funasr_model,
+        "device": settings.device,
+        "hub": settings.funasr_hub,
+        "disable_update": True,
+    }
+
+    if _uses_sensevoice_model(settings.funasr_model):
+        kwargs["vad_model"] = settings.funasr_vad_model
+        kwargs["vad_kwargs"] = {"max_single_segment_time": 30_000}
+        kwargs["trust_remote_code"] = True
+    else:
+        kwargs["vad_model"] = settings.funasr_vad_model
+        kwargs["punc_model"] = settings.funasr_punc_model
+
+    return kwargs
+
+
+def _funasr_generate_kwargs(settings: MeetingAISettings, language: str) -> dict[str, Any]:
+    if _uses_sensevoice_model(settings.funasr_model):
+        return {
+            "input": None,
+            "cache": {},
+            "language": _sensevoice_language_hint(language),
+            "use_itn": False,
+            "batch_size_s": 0,
+        }
+    return {
+        "input": None,
+        "sentence_timestamp": True,
+        "return_raw_text": True,
+        "en_post_proc": language.lower().startswith("en"),
+    }
+
+
 def _coerce_seconds(value: Any, audio_duration: float | None) -> float:
     seconds = float(value)
     if audio_duration is not None and seconds > (audio_duration + 5):
@@ -34,10 +85,16 @@ def _coerce_seconds(value: Any, audio_duration: float | None) -> float:
     return round(max(seconds, 0.0), 3)
 
 
+def _clean_transcript_text(text: str) -> str:
+    normalized = _CONTROL_TOKEN_PATTERN.sub("", text)
+    normalized = re.sub(r"\s+", " ", normalized)
+    return normalized.strip()
+
+
 def normalize_sentence_info(sentence_info: list[dict[str, Any]], audio_duration: float | None) -> list[TranscriptSegment]:
     segments: list[TranscriptSegment] = []
     for item in sentence_info:
-        text = str(item.get("text", "")).strip()
+        text = _clean_transcript_text(str(item.get("text", "")))
         if not text:
             continue
         segments.append(
@@ -46,7 +103,7 @@ def normalize_sentence_info(sentence_info: list[dict[str, Any]], audio_duration:
                 text=text,
                 start=_coerce_seconds(item.get("start", 0.0), audio_duration),
                 end=_coerce_seconds(item.get("end", 0.0), audio_duration),
-                raw_text=item.get("raw_text"),
+                raw_text=_clean_transcript_text(str(item.get("raw_text", "")).strip()) or None,
             )
         )
     return sorted(segments, key=lambda seg: (seg.start, seg.end))
@@ -100,25 +157,15 @@ class FunASRTranscriber:
                 self.settings.funasr_punc_model,
                 self.settings.device,
             )
-            self._model = AutoModel(
-                model=self.settings.funasr_model,
-                vad_model=self.settings.funasr_vad_model,
-                punc_model=self.settings.funasr_punc_model,
-                device=self.settings.device,
-                hub=self.settings.funasr_hub,
-                disable_update=True,
-            )
+            self._model = AutoModel(**_funasr_model_kwargs(self.settings))
         return self._model
 
     def transcribe(self, audio_path: Path, language: str, audio_duration: float) -> tuple[list[TranscriptSegment], dict[str, Any]]:
         model = self._load()
         started = time.perf_counter()
-        result = model.generate(
-            input=str(audio_path),
-            sentence_timestamp=True,
-            return_raw_text=True,
-            en_post_proc=language.lower().startswith("en"),
-        )
+        generate_kwargs = _funasr_generate_kwargs(self.settings, language)
+        generate_kwargs["input"] = str(audio_path)
+        result = model.generate(**generate_kwargs)
         elapsed = round(time.perf_counter() - started, 3)
         payload = result[0] if result else {}
         sentence_info = payload.get("sentence_info") or []
@@ -128,10 +175,10 @@ class FunASRTranscriber:
             segments = [
                 TranscriptSegment(
                     speaker="SPEAKER_00",
-                    text=str(payload["text"]).strip(),
+                    text=_clean_transcript_text(str(payload["text"])),
                     start=0.0,
                     end=round(audio_duration, 3),
-                    raw_text=payload.get("raw_text"),
+                    raw_text=_clean_transcript_text(str(payload.get("raw_text", "")).strip()) or None,
                 )
             ]
 

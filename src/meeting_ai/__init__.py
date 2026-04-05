@@ -5,6 +5,7 @@ ensure_runtime_paths()
 from .asr_agent import MeetingASRAgent
 from .action_item_agent import ActionItemAgent
 from .llm_tools import UnifiedLLMClient
+from .baseline import SerialMeetingPipeline
 from .orchestrator import MeetingOrchestrator
 from .retrieval import MeetingVectorStore
 from .sentiment_agent import SentimentAgent
@@ -16,6 +17,7 @@ __all__ = [
     "MeetingASRAgent",
     "MeetingOrchestrator",
     "MeetingVectorStore",
+    "SerialMeetingPipeline",
     "SentimentAgent",
     "SummaryAgent",
     "TranslationAgent",
