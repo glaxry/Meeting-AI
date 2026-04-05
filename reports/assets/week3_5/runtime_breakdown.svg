@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" fill="none">
+<rect width="1120" height="560" fill="#f8fafc"/>
+<text x="60" y="46" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#1f2937">Runtime Breakdown from `data/outputs/week3_test_run.json`</text>
+<text x="60" y="78" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Workflow latency: 225.154s</text>
+<text x="60" y="98" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Audio duration: 539.905s</text>
+<text x="60" y="118" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Workflow RTF: 0.417</text>
+<text x="60" y="133" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Audio Duration</text>
+<rect x="240" y="110" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="110" width="800" height="34" rx="12" fill="#2563eb"/>
+<text x="1056" y="133" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">539.905s | RTF 1.000</text>
+<text x="60" y="185" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">ASR</text>
+<rect x="240" y="162" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="162" width="21" height="34" rx="12" fill="#2563eb"/>
+<text x="277" y="185" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">14.175s | RTF 0.026</text>
+<text x="60" y="237" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Diarization</text>
+<rect x="240" y="214" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="214" width="27" height="34" rx="12" fill="#2563eb"/>
+<text x="283" y="237" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">18.540s | RTF 0.034</text>
+<text x="60" y="289" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Summary</text>
+<rect x="240" y="266" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="266" width="31" height="34" rx="12" fill="#2563eb"/>
+<text x="287" y="289" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">20.993s | RTF 0.039</text>
+<text x="60" y="341" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Translation</text>
+<rect x="240" y="318" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="318" width="233" height="34" rx="12" fill="#2563eb"/>
+<text x="489" y="341" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">157.474s | RTF 0.292</text>
+<text x="60" y="393" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Action Items</text>
+<rect x="240" y="370" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="370" width="27" height="34" rx="12" fill="#2563eb"/>
+<text x="283" y="393" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">18.361s | RTF 0.034</text>
+<text x="60" y="445" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Sentiment</text>
+<rect x="240" y="422" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="422" width="113" height="34" rx="12" fill="#2563eb"/>
+<text x="369" y="445" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">76.791s | RTF 0.142</text>
+<text x="60" y="497" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">Workflow</text>
+<rect x="240" y="474" width="800" height="34" rx="12" fill="#e2e8f0"/>
+<rect x="240" y="474" width="333" height="34" rx="12" fill="#2563eb"/>
+<text x="589" y="497" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">225.154s | RTF 0.417</text>
+</svg>

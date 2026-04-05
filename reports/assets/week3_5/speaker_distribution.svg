@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="420" viewBox="0 0 1120 420" fill="none">
+<rect width="1120" height="420" fill="#f8fafc"/>
+<text x="60" y="46" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#1f2937">Speaker Distribution on `test.wav`</text>
+<text x="60" y="78" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Detected speakers: 6</text>
+<text x="60" y="98" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Transcript segments: 276</text>
+<text x="60" y="130" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_02</text>
+<rect x="300" y="110" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="110" width="740" height="28" rx="12" fill="#0f766e"/>
+<text x="1056" y="130" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">198</text>
+<text x="60" y="176" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_04</text>
+<rect x="300" y="156" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="156" width="89" height="28" rx="12" fill="#0f766e"/>
+<text x="405" y="176" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">24</text>
+<text x="60" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_00</text>
+<rect x="300" y="202" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="202" width="63" height="28" rx="12" fill="#0f766e"/>
+<text x="379" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">17</text>
+<text x="60" y="268" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_03</text>
+<rect x="300" y="248" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="248" width="63" height="28" rx="12" fill="#0f766e"/>
+<text x="379" y="268" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">17</text>
+<text x="60" y="314" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_05</text>
+<rect x="300" y="294" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="294" width="44" height="28" rx="12" fill="#0f766e"/>
+<text x="360" y="314" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">12</text>
+<text x="60" y="360" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#1f2937">SPEAKER_01</text>
+<rect x="300" y="340" width="740" height="28" rx="12" fill="#e2e8f0"/>
+<rect x="300" y="340" width="29" height="28" rx="12" fill="#0f766e"/>
+<text x="345" y="360" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">8</text>
+</svg>

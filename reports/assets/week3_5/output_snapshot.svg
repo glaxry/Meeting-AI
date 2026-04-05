@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1370" height="860" viewBox="0 0 1370 860" fill="none">
+<rect width="1370" height="860" fill="#f8fafc"/>
+<text x="50" y="40" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#1f2937">Real Output Snapshot from `test.wav`</text>
+<text x="50" y="68" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Panels below are rendered from the actual Week 3 workflow JSON, not placeholders.</text>
+<rect x="50" y="100" width="620" height="380" rx="24" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="74" y="140" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="600" fill="#1f2937">Transcript Preview</text>
+<text x="74" y="184" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">2.98- 4.74s [SPEAKER_02] 我去这边还有一个包装。</text>
+<text x="74" y="208" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">5.16- 7.42s [SPEAKER_02] 关于这个包装呢是这样子的，</text>
+<text x="74" y="232" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">9.41- 10.35s [SPEAKER_02] 这边有一个包装，</text>
+<text x="74" y="256" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">10.37- 13.31s [SPEAKER_02] 大家看一下有一个包装的一个打分，</text>
+<text x="74" y="280" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">13.31- 16.01s [SPEAKER_02] 这边呢就是一个五粮液的幺九九五，</text>
+<text x="74" y="304" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">16.01- 17.71s [SPEAKER_02] 这边是梦之蓝的 m 三。</text>
+<rect x="700" y="100" width="620" height="380" rx="24" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="724" y="140" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="600" fill="#1f2937">Summary Preview</text>
+<text x="724" y="184" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Topics:</text>
+<text x="724" y="208" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Packaging evaluation for Wuliangye 1995,</text>
+<text x="724" y="232" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937"> Mengzhilan M3, and Jiannanchun</text>
+<text x="724" y="256" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- 包装展示与摆放</text>
+<text x="724" y="280" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- 产品评价（包装、口感、香型、品质）</text>
+<text x="724" y="304" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- 感受评价与评分理由</text>
+<text x="724" y="328" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Discussion of wine quality and potential</text>
+<text x="724" y="352" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937"> improvements</text>
+<text x="724" y="376" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Decisions:</text>
+<text x="724" y="400" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- 将包装放在中间以便更直观展示</text>
+<rect x="50" y="510" width="620" height="300" rx="24" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="74" y="550" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="600" fill="#1f2937">Action Items</text>
+<text x="74" y="594" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Unassigned: Review and score the packagi</text>
+<text x="74" y="618" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ng for Wuliangye 1995, Mengzhilan M3, and </text>
+<text x="74" y="642" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Jiannanchun (medium)</text>
+<text x="74" y="666" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Unassigned: Provide feedback on which pa</text>
+<text x="74" y="690" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ckaging is preferred and why, including su</text>
+<text x="74" y="714" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ggestions for improvement (medium)</text>
+<text x="74" y="738" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Unassigned: Fill out the small questionn</text>
+<text x="74" y="762" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">aire about the packaging (medium)</text>
+<text x="74" y="786" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Unassigned: Write targeted opinions and </text>
+<rect x="700" y="510" width="620" height="300" rx="24" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="724" y="550" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="600" fill="#1f2937">Translation + Sentiment</text>
+<text x="724" y="594" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] I have another packaging here</text>
+<text x="724" y="618" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">.</text>
+<text x="724" y="642" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] Regarding this packaging, it&#x27;</text>
+<text x="724" y="666" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">s like this,</text>
+<text x="724" y="690" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] there is a packaging here,</text>
+<text x="724" y="714" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] everyone take a look, there i</text>
+<text x="724" y="738" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">s a packaging scoring,</text>
+<text x="724" y="762" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] here is Wuliangye 1995,</text>
+<text x="724" y="786" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">[SPEAKER_02] here is Mengzhilan M3.</text>
+</svg>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="430" viewBox="0 0 1220 430" fill="none">
+<rect width="1220" height="430" fill="#f8fafc"/>
+<text x="60" y="42" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#1f2937">Meeting AI Week 3 System Design</text>
+<text x="60" y="68" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Architecture rendered from the implemented pipeline in the repository.</text>
+<line x1="280" y1="136" x2="340" y2="136" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="560" y1="136" x2="620" y2="136" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="880" y1="106" x2="940" y2="76" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="880" y1="136" x2="940" y2="162" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="880" y1="166" x2="940" y2="248" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="880" y1="196" x2="940" y2="334" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1050" y1="112" x2="750" y2="282" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1050" y1="198" x2="750" y2="282" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1050" y1="284" x2="750" y2="282" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1050" y1="370" x2="750" y2="282" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="620" y1="336" x2="560" y2="336" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="340" y1="336" x2="280" y2="336" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="90" width="220" height="92" rx="22" fill="#dbeafe" stroke="#94a3b8" stroke-width="2"/>
+<text x="78" y="124" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Audio Input</text>
+<text x="78" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">`test.wav` upload or CLI input</text>
+<rect x="340" y="90" width="220" height="92" rx="22" fill="#dcfce7" stroke="#94a3b8" stroke-width="2"/>
+<text x="358" y="124" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">ASR + Diarization</text>
+<text x="358" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">FunASR transcription</text>
+<text x="358" y="174" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">pyannote speaker labels</text>
+<rect x="620" y="70" width="260" height="132" rx="22" fill="#fef3c7" stroke="#94a3b8" stroke-width="2"/>
+<text x="638" y="104" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">LangGraph Orchestrator</text>
+<text x="638" y="132" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">routing</text>
+<text x="638" y="154" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">error isolation</text>
+<text x="638" y="176" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">parallel fan-out</text>
+<rect x="940" y="40" width="220" height="72" rx="22" fill="#fce7f3" stroke="#94a3b8" stroke-width="2"/>
+<text x="958" y="74" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Summary Agent</text>
+<text x="958" y="102" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">map-reduce JSON</text>
+<rect x="940" y="126" width="220" height="72" rx="22" fill="#ede9fe" stroke="#94a3b8" stroke-width="2"/>
+<text x="958" y="160" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Translation Agent</text>
+<text x="958" y="188" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">speaker-preserving</text>
+<rect x="940" y="212" width="220" height="72" rx="22" fill="#fee2e2" stroke="#94a3b8" stroke-width="2"/>
+<text x="958" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Action Agent</text>
+<text x="958" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">assignee / task / priority</text>
+<rect x="940" y="298" width="220" height="72" rx="22" fill="#e0f2fe" stroke="#94a3b8" stroke-width="2"/>
+<text x="958" y="332" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Sentiment Agent</text>
+<text x="958" y="360" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">LLM or transformer route</text>
+<rect x="620" y="282" width="260" height="108" rx="22" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="638" y="316" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Aggregate Result</text>
+<text x="638" y="344" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">Pydantic workflow payload</text>
+<text x="638" y="366" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">runtime metadata</text>
+<rect x="340" y="282" width="220" height="108" rx="22" fill="#ecfccb" stroke="#94a3b8" stroke-width="2"/>
+<text x="358" y="316" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Chroma History</text>
+<text x="358" y="344" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">meeting summary persistence</text>
+<text x="358" y="366" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">cross-meeting retrieval</text>
+<rect x="60" y="282" width="220" height="108" rx="22" fill="#ffedd5" stroke="#94a3b8" stroke-width="2"/>
+<text x="78" y="316" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="22" font-weight="600" fill="#1f2937">Gradio UI / CLI</text>
+<text x="78" y="344" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">transcript</text>
+<text x="78" y="366" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">summary</text>
+<text x="78" y="388" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">action items</text>
+<text x="78" y="410" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">history query</text>
+<defs>
+  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+    <path d="M0,0 L12,6 L0,12 z" fill="#475569"/>
+  </marker>
+</defs>
+</svg>

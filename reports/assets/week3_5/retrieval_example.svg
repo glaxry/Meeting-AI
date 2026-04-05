@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="670" viewBox="0 0 1360 670" fill="none">
+<rect width="1360" height="670" fill="#f8fafc"/>
+<text x="50" y="40" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#1f2937">Chroma Retrieval Example</text>
+<text x="50" y="68" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#1f2937">History query is executed against persisted meeting summaries.</text>
+<rect x="50" y="100" width="1260" height="520" rx="24" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="74" y="140" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="600" fill="#1f2937">Retrieved Records</text>
+<text x="74" y="184" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Query: 参会者对包装和口感的主要意见是什么？</text>
+<text x="74" y="208" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937"></text>
+<text x="74" y="232" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Top 1: 1e2fdea9fc3b49249cadfb10860ee78f (score=0.867901)</text>
+<text x="74" y="256" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Topics: - Packaging evaluation for Wuliangye 1995, Mengzhilan M3, and Jiannanchun - 包装</text>
+<text x="74" y="280" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">展示与摆放 - 产品评价（包装、口感、香型、品质） - 感受评价与评分理由 - Discussion of wine quality and potential impro</text>
+<text x="74" y="304" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">vements - Comparison of wine purity and aroma with other brands - Evaluation of Jianna</text>
+<text x="74" y="328" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">nchun liquor&#x27;s taste and aroma - Discussion on Wuliangye 95 liquor&#x27;s pricing - Price c</text>
+<text x="74" y="352" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">oncerns for wine - Packaging quality and perceived value - Comparison of win</text>
+<text x="74" y="376" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937"></text>
+<text x="74" y="400" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Top 2: 655cbef16f9841cdbb37f8412bd89e97 (score=0.863375)</text>
+<text x="74" y="424" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Topics: - Packaging evaluation for Wuliangye 1995, Mengzhilan M3, and Jiannanchun - Pa</text>
+<text x="74" y="448" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ckaging display and placement - Product evaluation (packaging, taste, aroma, quality) </text>
+<text x="74" y="472" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">- Wine quality and potential improvements - Comparison of wine purity and aroma with o</text>
+<text x="74" y="496" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ther brands - Evaluation of Jiannanchun liquor&#x27;s taste and aroma - Discussion of Wulia</text>
+<text x="74" y="520" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">ngye 95 liquor&#x27;s pricing - Price concerns for wine - Packaging quality and p</text>
+<text x="74" y="544" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937"></text>
+<text x="74" y="568" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Top 3: bf313473cddd439b9341da2a15546093 (score=0.827126)</text>
+<text x="74" y="592" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#1f2937">Topics: - 园林茅草盖顶的庭轩描写 - 诗人对自然生活的向往 - 隐逸生活的欣赏 - 淡泊名利追求内心安宁的心境 Decisions: - None recorde</text>
+</svg>

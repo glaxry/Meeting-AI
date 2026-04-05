@@ -1,0 +1,199 @@
+{
+  "generated_on": "2026-04-05",
+  "meeting_id": "1e2fdea9fc3b49249cadfb10860ee78f",
+  "provider": "deepseek",
+  "selected_agents": [
+    "summary",
+    "translation",
+    "action_items",
+    "sentiment"
+  ],
+  "transcript": {
+    "audio_path": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\samples\\test.wav",
+    "language": "zh",
+    "segment_count": 276,
+    "preview": [
+      "  2.98-  4.74s [SPEAKER_02] 我去这边还有一个包装。",
+      "  5.16-  7.42s [SPEAKER_02] 关于这个包装呢是这样子的，",
+      "  9.41- 10.35s [SPEAKER_02] 这边有一个包装，",
+      " 10.37- 13.31s [SPEAKER_02] 大家看一下有一个包装的一个打分，",
+      " 13.31- 16.01s [SPEAKER_02] 这边呢就是一个五粮液的幺九九五，",
+      " 16.01- 17.71s [SPEAKER_02] 这边是梦之蓝的 m 三。"
+    ],
+    "speaker_distribution": {
+      "SPEAKER_02": 198,
+      "SPEAKER_04": 24,
+      "SPEAKER_00": 17,
+      "SPEAKER_03": 17,
+      "SPEAKER_05": 12,
+      "SPEAKER_01": 8
+    }
+  },
+  "summary": {
+    "strategy": "map_reduce",
+    "word_count": 2444,
+    "chunk_count": 7,
+    "map_latencies": [
+      3.44,
+      2.408,
+      2.251,
+      1.706,
+      2.423,
+      1.603,
+      1.387
+    ],
+    "reduce_latency": 5.775,
+    "total_latency_seconds": 20.993,
+    "preview": {
+      "topics": [
+        "Packaging evaluation for Wuliangye 1995, Mengzhilan M3, and Jiannanchun",
+        "包装展示与摆放",
+        "产品评价（包装、口感、香型、品质）",
+        "感受评价与评分理由",
+        "Discussion of wine quality and potential improvements"
+      ],
+      "decisions": [
+        "将包装放在中间以便更直观展示"
+      ],
+      "follow_ups": [
+        "Participants to fill out questionnaire on packaging preferences and improvements",
+        "收集针对包装、口感、香型、品质的意见和建议",
+        "完成感受评价并说明评分理由",
+        "Investigate and address purity issues in the wine"
+      ]
+    }
+  },
+  "translation": {
+    "source_language": "zh",
+    "target_language": "en",
+    "chunk_count": 7,
+    "latencies": [
+      27.704,
+      28.56,
+      21.422,
+      22.759,
+      22.825,
+      23.443,
+      10.761
+    ],
+    "total_latency_seconds": 157.474,
+    "preview": [
+      "[SPEAKER_02] I have another packaging here.",
+      "[SPEAKER_02] Regarding this packaging, it's like this,",
+      "[SPEAKER_02] there is a packaging here,",
+      "[SPEAKER_02] everyone take a look, there is a packaging scoring,",
+      "[SPEAKER_02] here is Wuliangye 1995,",
+      "[SPEAKER_02] here is Mengzhilan M3."
+    ]
+  },
+  "action_items": {
+    "count": 7,
+    "chunk_count": 7,
+    "latencies": [
+      6.849,
+      3.816,
+      1.05,
+      1.007,
+      3.478,
+      1.051,
+      1.11
+    ],
+    "total_latency_seconds": 18.361,
+    "preview": [
+      "Unassigned: Review and score the packaging for Wuliangye 1995, Mengzhilan M3, and Jiannanchun (medium)",
+      "Unassigned: Provide feedback on which packaging is preferred and why, including suggestions for improvement (medium)",
+      "Unassigned: Fill out the small questionnaire about the packaging (medium)",
+      "Unassigned: Write targeted opinions and suggestions on packaging, taste, aroma, and quality (medium)",
+      "Unassigned: Write a feeling evaluation explaining why a score was given (medium)"
+    ]
+  },
+  "sentiment": {
+    "route": "llm",
+    "overall_tone": "neutral",
+    "segment_count": 276,
+    "distribution": {
+      "neutral": 276
+    },
+    "latency_seconds": 76.791
+  },
+  "retrieval": {
+    "query": "参会者对包装和口感的主要意见是什么？",
+    "result_count": 3,
+    "preview": [
+      {
+        "meeting_id": "1e2fdea9fc3b49249cadfb10860ee78f",
+        "score": 0.867901,
+        "document": "Topics:\n- Packaging evaluation for Wuliangye 1995, Mengzhilan M3, and Jiannanchun\n- 包装展示与摆放\n- 产品评价（包装、口感、香型、品质）\n- 感受评价与评分理由\n- Discussion of wine quality and potential improvements\n- Comparison of wine purity and aroma with other brands\n- Evaluation of Jiannanchun liquor's taste and aroma\n- Discussion on Wuliangye 95 liquor's pricing\n- Price concerns for wine\n- Packaging quality and perceived value\n- Comparison of win"
+      },
+      {
+        "meeting_id": "655cbef16f9841cdbb37f8412bd89e97",
+        "score": 0.863375,
+        "document": "Topics:\n- Packaging evaluation for Wuliangye 1995, Mengzhilan M3, and Jiannanchun\n- Packaging display and placement\n- Product evaluation (packaging, taste, aroma, quality)\n- Wine quality and potential improvements\n- Comparison of wine purity and aroma with other brands\n- Evaluation of Jiannanchun liquor's taste and aroma\n- Discussion of Wuliangye 95 liquor's pricing\n- Price concerns for wine\n- Packaging quality and p"
+      },
+      {
+        "meeting_id": "bf313473cddd439b9341da2a15546093",
+        "score": 0.827126,
+        "document": "Topics:\n- 园林茅草盖顶的庭轩描写\n- 诗人对自然生活的向往\n- 隐逸生活的欣赏\n- 淡泊名利追求内心安宁的心境\nDecisions:\n- None recorded\nFollow-ups:\n- None recorded\nTranscript excerpt:\n[SPEAKER_00] 这两句描绘了一处远离尘嚣，\n[SPEAKER_00] 建在山丘上的园林茅草盖顶的庭轩曲折幽深，\n[SPEAKER_00] 环境宁静而充满乐趣。\n[SPEAKER_00] 这种描写反映诗人对自然生活的向往和对隐逸生活的欣赏，\n[SPEAKER_00] 也透露出一种淡泊名利、\n[SPEAKER_00] 追求内心安宁的心境。"
+      }
+    ]
+  },
+  "runtime": {
+    "audio_duration_seconds": 539.905,
+    "asr_runtime_seconds": 14.175,
+    "diarization_runtime_seconds": 18.54,
+    "workflow_latency_seconds": 225.154,
+    "workflow_rtf": 0.417,
+    "accounted_latency_seconds": 306.334,
+    "parallel_time_saved_seconds": 81.18,
+    "stages": [
+      {
+        "name": "Audio Duration",
+        "seconds": 539.905,
+        "rtf": 1.0
+      },
+      {
+        "name": "ASR",
+        "seconds": 14.175,
+        "rtf": 0.026
+      },
+      {
+        "name": "Diarization",
+        "seconds": 18.54,
+        "rtf": 0.034
+      },
+      {
+        "name": "Summary",
+        "seconds": 20.993,
+        "rtf": 0.039
+      },
+      {
+        "name": "Translation",
+        "seconds": 157.474,
+        "rtf": 0.292
+      },
+      {
+        "name": "Action Items",
+        "seconds": 18.361,
+        "rtf": 0.034
+      },
+      {
+        "name": "Sentiment",
+        "seconds": 76.791,
+        "rtf": 0.142
+      },
+      {
+        "name": "Workflow",
+        "seconds": 225.154,
+        "rtf": 0.417
+      }
+    ]
+  },
+  "errors": {},
+  "limitations": {
+    "wer_cer_status": "pending_reference_transcript",
+    "notes": [
+      "The repo includes jiwer in requirements, but test.wav has no aligned human reference transcript yet.",
+      "LLM sentiment on the current sample collapsed to all-neutral labels, which is acceptable for Week 3.5 but should be benchmarked in Week 4."
+    ]
+  }
+}
