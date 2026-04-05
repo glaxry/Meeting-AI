@@ -1,10 +1,11 @@
 # Meeting AI
 
-`Meeting AI` has working deliverables for Week 1, Week 2, and Week 3 from `guide.md`.
+`Meeting AI` has working deliverables for Week 1, Week 2, Week 3, and the Week 3.5 progress-report milestone from `guide.md`.
 
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
 - Week 3: LangGraph orchestration, Chroma retrieval, Gradio UI
+- Week 3.5: report generation from real workflow artifacts
 
 The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarization, transformer sentiment, and embeddings. DeepSeek or Qwen is used for LLM tasks.
 
@@ -17,6 +18,7 @@ The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarizati
 - `sentiment_agent.py`: `llm` and `transformer` routes with unified schema
 - `orchestrator.py`: Week 3 LangGraph workflow
 - `src/meeting_ai/retrieval.py`: Chroma + sentence-transformers retrieval
+- `src/meeting_ai/reporting.py`: Week 3.5 report and SVG asset generation
 - `ui/app.py`: Gradio interface for end-to-end runs
 
 ## Environment Setup
@@ -174,6 +176,24 @@ http://127.0.0.1:7860
 - Meeting summaries are stored in Chroma automatically
 - History retrieval reads from stored summaries
 
+## Week 3.5 Report Generation
+
+Generate the progress report from the real `test.wav` run:
+
+```powershell
+python scripts/week35_report.py --run-json .\data\outputs\week3_test_run.json --output-root .\reports
+```
+
+This writes:
+
+- `reports\week3_5_progress_report.md`
+- `reports\assets\week3_5\metrics.json`
+- `reports\assets\week3_5\system_design.svg`
+- `reports\assets\week3_5\runtime_breakdown.svg`
+- `reports\assets\week3_5\speaker_distribution.svg`
+- `reports\assets\week3_5\output_snapshot.svg`
+- `reports\assets\week3_5\retrieval_example.svg`
+
 ## Important Files
 
 ```text
@@ -190,7 +210,8 @@ http://127.0.0.1:7860
 |   |-- check_env.py
 |   |-- week1_demo.py
 |   |-- week2_demo.py
-|   `-- week3_demo.py
+|   |-- week3_demo.py
+|   `-- week35_report.py
 |-- src
 |   `-- meeting_ai
 |       |-- asr_agent.py
@@ -200,15 +221,21 @@ http://127.0.0.1:7860
 |       |-- sentiment_agent.py
 |       |-- orchestrator.py
 |       |-- retrieval.py
+|       |-- reporting.py
 |       |-- runtime.py
 |       |-- config.py
 |       `-- schemas.py
+|-- reports
+|   |-- week3_5_progress_report.md
+|   `-- assets
+|       `-- week3_5
 |-- tests
 |   |-- test_asr_agent.py
 |   |-- test_summary_agent.py
 |   |-- test_translation_agent.py
 |   |-- test_action_item_agent.py
 |   |-- test_sentiment_agent.py
+|   |-- test_reporting.py
 |   |-- test_retrieval.py
 |   `-- test_orchestrator.py
 `-- ui
