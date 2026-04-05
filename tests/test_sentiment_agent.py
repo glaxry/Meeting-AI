@@ -102,3 +102,27 @@ def test_sentiment_agent_transformer_route_normalizes_to_five_labels() -> None:
     assert result.segments[1].sentiment == SentimentLabel.HESITATION
     assert result.segments[2].sentiment == SentimentLabel.TENSION
     assert result.overall_tone == SentimentLabel.TENSION
+
+
+def test_sentiment_agent_llm_route_tolerates_missing_overall_tone() -> None:
+    llm_client = QueuedLLMClient(
+        payloads=[
+            {
+                "segments": [
+                    {"index": 0, "sentiment": "agreement", "confidence": 0.88},
+                    {"index": 1, "sentiment": "neutral", "confidence": 0.51},
+                    {"index": 2, "sentiment": "tension", "confidence": 0.9},
+                ]
+            }
+        ]
+    )
+    agent = SentimentAgent(
+        settings=MeetingAISettings(),
+        llm_client=llm_client,
+        provider=LLMProvider.DEEPSEEK,
+    )
+
+    result = agent.analyze(route="llm", transcript=build_segments())
+
+    assert result.overall_tone == SentimentLabel.TENSION
+    assert len(result.segments) == 3

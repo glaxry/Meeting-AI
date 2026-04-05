@@ -39,10 +39,14 @@ class SentenceTransformerEmbedder:
             self._model = SentenceTransformer(self.settings.embedding_model, device=self.settings.device)
         return self._model
 
-    def encode_texts(self, texts: list[str]) -> list[list[float]]:
+    def encode_texts(self, texts: list[str], task: str = "passage") -> list[list[float]]:
         model = self._load()
+        normalized_texts = texts
+        if "e5" in self.settings.embedding_model.lower():
+            prefix = "query: " if task == "query" else "passage: "
+            normalized_texts = [f"{prefix}{text}" for text in texts]
         encoded = model.encode(
-            texts,
+            normalized_texts,
             convert_to_numpy=True,
             normalize_embeddings=True,
             show_progress_bar=False,
@@ -85,7 +89,7 @@ class MeetingVectorStore:
         collection = self._get_collection()
         resolved_meeting_id = meeting_id or uuid4().hex
         document = _summary_to_document(summary, transcript)
-        embedding = self.embedder.encode_texts([document])[0]
+        embedding = self.embedder.encode_texts([document], task="passage")[0]
         base_metadata: dict[str, Any] = {
             "meeting_id": resolved_meeting_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -106,7 +110,7 @@ class MeetingVectorStore:
 
     def query(self, question: str, top_k: int = 3) -> list[RetrievalRecord]:
         collection = self._get_collection()
-        embedding = self.embedder.encode_texts([question])[0]
+        embedding = self.embedder.encode_texts([question], task="query")[0]
         result = collection.query(
             query_embeddings=[embedding],
             n_results=top_k,

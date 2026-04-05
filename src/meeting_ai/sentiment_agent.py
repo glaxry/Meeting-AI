@@ -11,8 +11,7 @@ from pydantic import BaseModel, Field
 from .config import MeetingAISettings, get_settings
 from .llm_tools import UnifiedLLMClient
 from .schemas import LLMProvider, SentimentLabel, SentimentResult, SentimentSegment, TranscriptResult, TranscriptSegment
-from .structured_llm import prompt_json
-from .text_utils import load_text_input, load_transcript_json, parse_labelled_lines, transcript_to_segments
+from .text_utils import extract_json_payload, load_text_input, load_transcript_json, parse_labelled_lines, transcript_to_segments
 
 
 LOGGER = logging.getLogger(__name__)
@@ -151,6 +150,66 @@ def _resolve_overall_tone(segments: list[SentimentSegment]) -> SentimentLabel:
     )
 
 
+def _coerce_sentiment_label(value: Any) -> SentimentLabel:
+    try:
+        return SentimentLabel(str(value).strip().lower())
+    except Exception:
+        return SentimentLabel.NEUTRAL
+
+
+def _normalize_llm_payload(payload: Any, segment_count: int) -> _LLMSentimentPayload:
+    raw_segments: list[dict[str, Any]] = []
+    overall_tone: SentimentLabel | None = None
+
+    if isinstance(payload, dict):
+        if "overall_tone" in payload:
+            overall_tone = _coerce_sentiment_label(payload.get("overall_tone"))
+        if isinstance(payload.get("segments"), list):
+            raw_segments = [item for item in payload["segments"] if isinstance(item, dict)]
+        elif isinstance(payload.get("segments"), dict):
+            raw_segments = [payload["segments"]]
+        elif {"index", "sentiment", "confidence"}.intersection(payload.keys()):
+            raw_segments = [payload]
+    elif isinstance(payload, list):
+        raw_segments = [item for item in payload if isinstance(item, dict)]
+
+    segments: list[_LLMSentimentSegment] = []
+    for position, item in enumerate(raw_segments):
+        index = int(item.get("index", position))
+        sentiment = _coerce_sentiment_label(item.get("sentiment"))
+        confidence = float(item.get("confidence", 0.5))
+        segments.append(
+            _LLMSentimentSegment(
+                index=index,
+                sentiment=sentiment,
+                confidence=round(min(max(confidence, 0.0), 1.0), 3),
+            )
+        )
+
+    if not segments and segment_count > 0:
+        segments = [
+            _LLMSentimentSegment(
+                index=index,
+                sentiment=SentimentLabel.NEUTRAL,
+                confidence=0.5,
+            )
+            for index in range(segment_count)
+        ]
+
+    if overall_tone is None:
+        pseudo_segments = [
+            SentimentSegment(
+                text="",
+                sentiment=segment.sentiment,
+                confidence=segment.confidence,
+            )
+            for segment in segments
+        ]
+        overall_tone = _resolve_overall_tone(pseudo_segments)
+
+    return _LLMSentimentPayload(overall_tone=overall_tone, segments=segments)
+
+
 class TransformersSentimentClassifier:
     def __init__(self, settings: MeetingAISettings, classifier_pipeline: Any | None = None):
         self.settings = settings
@@ -257,10 +316,8 @@ class SentimentAgent:
             f"{index}\t[{segment.speaker}] {segment.text}"
             for index, segment in enumerate(segments)
         ]
-        payload, response = prompt_json(
-            llm_client=self.llm_client,
+        response = self.llm_client.prompt(
             provider=self.provider,
-            schema=_LLMSentimentPayload,
             prompt=(
                 "Classify the sentiment of each meeting segment and the overall meeting tone.\n"
                 "Input segments:\n"
@@ -268,7 +325,9 @@ class SentimentAgent:
             ),
             system_prompt=SENTIMENT_SYSTEM_PROMPT,
             temperature=0.1,
+            response_format={"type": "json_object"},
         )
+        payload = _normalize_llm_payload(extract_json_payload(response.content), len(segments))
 
         by_index = {entry.index: entry for entry in payload.segments}
         result_segments: list[SentimentSegment] = []

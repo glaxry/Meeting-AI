@@ -42,7 +42,7 @@ class MeetingAISettings(BaseSettings):
         default="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
         alias="SENTIMENT_TRANSFORMER_MODEL",
     )
-    embedding_model: str = Field(default="BAAI/bge-m3", alias="EMBEDDING_MODEL")
+    embedding_model: str = Field(default="intfloat/multilingual-e5-small", alias="EMBEDDING_MODEL")
 
     funasr_model: str = Field(default="paraformer-zh", alias="FUNASR_MODEL")
     funasr_vad_model: str = Field(default="fsmn-vad", alias="FUNASR_VAD_MODEL")

@@ -11,7 +11,9 @@ __pycache__/
 api-key-deepseek
 data/outputs/*
 !data/outputs/.gitkeep
+data/chroma/
 .idea/
 .vscode/
 *.rttm
 *.wav.bak
+data/samples/test.wav

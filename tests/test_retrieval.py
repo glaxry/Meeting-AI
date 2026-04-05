@@ -5,7 +5,7 @@ from meeting_ai.schemas import SummaryResult, TranscriptResult, TranscriptSegmen
 
 
 class FakeEmbedder:
-    def encode_texts(self, texts):
+    def encode_texts(self, texts, task="passage"):
         vectors = []
         for text in texts:
             launch = 1.0 if "launch" in text.lower() else 0.0
