@@ -42,6 +42,7 @@ class MeetingAISettings(BaseSettings):
         default="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
         alias="SENTIMENT_TRANSFORMER_MODEL",
     )
+    embedding_model: str = Field(default="BAAI/bge-m3", alias="EMBEDDING_MODEL")
 
     funasr_model: str = Field(default="paraformer-zh", alias="FUNASR_MODEL")
     funasr_vad_model: str = Field(default="fsmn-vad", alias="FUNASR_VAD_MODEL")
@@ -58,6 +59,9 @@ class MeetingAISettings(BaseSettings):
 
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
+    chroma_persist_dir: Path = Field(default=PROJECT_ROOT / "data" / "chroma", alias="CHROMA_PERSIST_DIR")
+    gradio_server_name: str = Field(default="127.0.0.1", alias="GRADIO_SERVER_NAME")
+    gradio_server_port: int = Field(default=7860, alias="GRADIO_SERVER_PORT")
 
     @property
     def device(self) -> str:
@@ -79,6 +83,10 @@ class MeetingAISettings(BaseSettings):
         self.default_output_dir.mkdir(parents=True, exist_ok=True)
         return self.default_output_dir
 
+    def ensure_chroma_dir(self) -> Path:
+        self.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
+        return self.chroma_persist_dir
+
     def redacted_summary(self) -> dict[str, object]:
         return {
             "device": self.device,
@@ -88,6 +96,8 @@ class MeetingAISettings(BaseSettings):
             "funasr_model": self.funasr_model,
             "pyannote_model": self.pyannote_model,
             "sentiment_transformer_model": self.sentiment_transformer_model,
+            "embedding_model": self.embedding_model,
+            "chroma_persist_dir": str(self.chroma_persist_dir),
         }
 
 

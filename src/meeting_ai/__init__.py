@@ -1,6 +1,8 @@
 from .asr_agent import MeetingASRAgent
 from .action_item_agent import ActionItemAgent
 from .llm_tools import UnifiedLLMClient
+from .orchestrator import MeetingOrchestrator
+from .retrieval import MeetingVectorStore
 from .sentiment_agent import SentimentAgent
 from .summary_agent import SummaryAgent
 from .translation_agent import TranslationAgent
@@ -8,6 +10,8 @@ from .translation_agent import TranslationAgent
 __all__ = [
     "ActionItemAgent",
     "MeetingASRAgent",
+    "MeetingOrchestrator",
+    "MeetingVectorStore",
     "SentimentAgent",
     "SummaryAgent",
     "TranslationAgent",

@@ -105,3 +105,22 @@ class SentimentResult(BaseModel):
     overall_tone: SentimentLabel
     segments: list[SentimentSegment] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RetrievalRecord(BaseModel):
+    meeting_id: str
+    document: str
+    score: float | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MeetingWorkflowResult(BaseModel):
+    transcript: TranscriptResult | None = None
+    summary: SummaryResult | None = None
+    translation: TranslationResult | None = None
+    action_items: ActionItemResult | None = None
+    sentiment: SentimentResult | None = None
+    history: list[RetrievalRecord] = Field(default_factory=list)
+    selected_agents: list[str] = Field(default_factory=list)
+    errors: dict[str, str] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
