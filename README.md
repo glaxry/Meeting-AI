@@ -1,12 +1,13 @@
 # Meeting AI
 
-`Meeting AI` has working deliverables for Week 1, Week 2, Week 3, the Week 3.5 progress-report milestone, and the Week 4 experiment harness from `guide.md`.
+`Meeting AI` has working deliverables for Week 1, Week 2, Week 3, the Week 3.5 progress-report milestone, the Week 4 experiment harness, and the Week 5 final-report/demo package from `guide.md`.
 
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
 - Week 3: LangGraph orchestration, Chroma retrieval, Gradio UI
 - Week 3.5: report generation from real workflow artifacts
 - Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
+- Week 5: final report, judge quick start, demo script, and presentation materials
 
 The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarization, transformer sentiment, and embeddings. DeepSeek or Qwen is used for LLM tasks.
 
@@ -22,6 +23,7 @@ The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarizati
 - `src/meeting_ai/reporting.py`: Week 3.5 report and SVG asset generation
 - `src/meeting_ai/evaluation.py`: shared evaluation metrics for Week 4
 - `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
+- `src/meeting_ai/final_materials.py`: Week 5 final report and demo-material generation
 - `ui/app.py`: Gradio interface for end-to-end runs
 
 ## Environment Setup
@@ -121,7 +123,7 @@ python -m pytest -q
 Expected:
 
 ```text
-33 passed
+34 passed
 ```
 
 ## Week 1 Quick Test
@@ -216,6 +218,47 @@ Generated files:
 - `reports\week4\sentiment_eval.json`
 - `reports\week4_experiments.md`
 
+## Week 5 Final Materials
+
+Generate the final report and demo package:
+
+```powershell
+python scripts/week5_materials.py --report-root .\reports --demo-root .\demo
+```
+
+Generated files:
+
+- `reports\final_project_report.md`
+- `reports\assets\week5\asr_compare.svg`
+- `reports\assets\week5\summary_compare.svg`
+- `reports\assets\week5\architecture_compare.svg`
+- `reports\assets\week5\sentiment_compare.svg`
+- `reports\assets\week5\final_overview.svg`
+- `demo\judge_quick_start.md`
+- `demo\demo_script.md`
+- `demo\presentation_outline.md`
+- `demo\qna_bank.md`
+- `demo\recording_runbook.md`
+- `demo\highlight_demo_transcript.md`
+
+## Judge Quick Start
+
+Fastest path for evaluators:
+
+```powershell
+conda activate meeting-ai-w1
+python scripts/check_env.py
+python ui\app.py
+```
+
+Then open `http://127.0.0.1:7860` and upload `data\samples\test.wav`.
+
+If a live API path is slow, the repo already contains fallback evidence:
+
+- `reports\final_project_report.md`
+- `reports\week4_experiments.md`
+- `reports\week4\*.json`
+
 ## Important Files
 
 ```text
@@ -237,6 +280,7 @@ Generated files:
 |   |-- week4_summary_eval.py
 |   |-- week4_architecture_eval.py
 |   |-- week4_sentiment_eval.py
+|   |-- week5_materials.py
 |   `-- week35_report.py
 |-- src
 |   `-- meeting_ai
@@ -249,15 +293,25 @@ Generated files:
 |       |-- retrieval.py
 |       |-- evaluation.py
 |       |-- baseline.py
+|       |-- final_materials.py
 |       |-- reporting.py
 |       |-- runtime.py
 |       |-- config.py
 |       `-- schemas.py
 |-- reports
+|   |-- final_project_report.md
 |   |-- week4_experiments.md
 |   |-- week3_5_progress_report.md
 |   `-- assets
-|       `-- week3_5
+|       |-- week3_5
+|       `-- week5
+|-- demo
+|   |-- judge_quick_start.md
+|   |-- demo_script.md
+|   |-- presentation_outline.md
+|   |-- qna_bank.md
+|   |-- recording_runbook.md
+|   `-- highlight_demo_transcript.md
 |-- tests
 |   |-- test_asr_agent.py
 |   |-- test_summary_agent.py
@@ -266,6 +320,7 @@ Generated files:
 |   |-- test_sentiment_agent.py
 |   |-- test_baseline.py
 |   |-- test_evaluation.py
+|   |-- test_final_materials.py
 |   |-- test_reporting.py
 |   |-- test_retrieval.py
 |   `-- test_orchestrator.py
