@@ -1,3 +1,7 @@
+from .runtime import ensure_runtime_paths
+
+ensure_runtime_paths()
+
 from .asr_agent import MeetingASRAgent
 from .action_item_agent import ActionItemAgent
 from .llm_tools import UnifiedLLMClient
