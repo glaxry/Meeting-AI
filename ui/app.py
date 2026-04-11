@@ -291,17 +291,17 @@ def build_app() -> gr.Blocks:
             run_button = gr.Button("Run Workflow", variant="primary")
             status = gr.Markdown(f"ffmpeg: {find_ffmpeg() or 'not found'} | server: {settings.gradio_server_name}:{settings.gradio_server_port}")
 
+            gr.Markdown("### Main Results")
+            transcript_text = gr.Textbox(lines=10, label="Transcript")
+            sentiment_text = gr.Textbox(lines=8, label="Sentiment")
+            summary_text = gr.Textbox(lines=10, label="Summary")
+
+            gr.Markdown("### Additional Outputs")
             with gr.Tabs():
-                with gr.Tab("Transcript"):
-                    transcript_text = gr.Textbox(lines=14, label="Transcript")
-                with gr.Tab("Summary"):
-                    summary_text = gr.Textbox(lines=14, label="Summary")
                 with gr.Tab("Action Items"):
                     action_items_text = gr.Textbox(lines=14, label="Action Items")
                 with gr.Tab("Translation"):
                     translation_text = gr.Textbox(lines=14, label="Translation")
-                with gr.Tab("Sentiment"):
-                    sentiment_text = gr.Textbox(lines=14, label="Sentiment")
                 with gr.Tab("History"):
                     history_text = gr.Textbox(lines=14, label="History Retrieval")
                 with gr.Tab("Diagnostics"):
