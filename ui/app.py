@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 import sys
 from pathlib import Path
 
@@ -50,6 +51,11 @@ body, .gradio-container {
 
 def _is_selected(selected_agents: list[str] | None, agent_name: str) -> bool:
     return selected_agents is None or agent_name in selected_agents
+
+
+@lru_cache(maxsize=1)
+def get_orchestrator() -> MeetingOrchestrator:
+    return MeetingOrchestrator(settings=get_settings())
 
 
 def format_transcript(result: MeetingWorkflowResult) -> str:
@@ -200,8 +206,7 @@ def run_pipeline(
     if not audio_path:
         raise gr.Error("Upload an audio file first.")
 
-    settings = get_settings()
-    orchestrator = MeetingOrchestrator(settings=settings)
+    orchestrator = get_orchestrator()
     glossary: dict[str, str] = {}
     for raw_line in glossary_text.splitlines():
         line = raw_line.strip()

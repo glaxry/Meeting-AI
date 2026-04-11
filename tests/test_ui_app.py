@@ -13,6 +13,7 @@ from meeting_ai.schemas import (
     TranscriptSegment,
     TranslationResult,
 )
+import ui.app as app_module
 from ui.app import format_action_items, format_history, format_sentiment, format_summary, format_translation
 
 
@@ -44,6 +45,25 @@ def test_format_history_renders_scores() -> None:
 
     assert "meeting-1" in text
     assert "0.910" in text
+
+
+def test_get_orchestrator_reuses_instance(monkeypatch) -> None:
+    app_module.get_orchestrator.cache_clear()
+    created = []
+
+    class DummyOrchestrator:
+        def __init__(self, settings) -> None:
+            created.append(settings)
+
+    monkeypatch.setattr(app_module, "MeetingOrchestrator", DummyOrchestrator)
+    try:
+        first = app_module.get_orchestrator()
+        second = app_module.get_orchestrator()
+    finally:
+        app_module.get_orchestrator.cache_clear()
+
+    assert first is second
+    assert len(created) == 1
 
 
 def test_format_summary_renders_sections() -> None:
