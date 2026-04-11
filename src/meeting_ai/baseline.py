@@ -63,7 +63,7 @@ class SerialMeetingPipeline:
 
         self._configure_provider(provider)
         started = time.perf_counter()
-        selected = selected_agents or ["summary", "translation", "action_items", "sentiment"]
+        selected = selected_agents if selected_agents is not None else ["summary", "translation", "action_items", "sentiment"]
         errors: dict[str, str] = {}
 
         resolved_transcript = transcript

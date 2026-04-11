@@ -210,7 +210,7 @@ class MeetingOrchestrator:
             "target_language": target_language,
             "provider": provider.value,
             "glossary": glossary or {},
-            "selected_agents": selected_agents or ["summary", "translation", "action_items", "sentiment"],
+            "selected_agents": selected_agents if selected_agents is not None else ["summary", "translation", "action_items", "sentiment"],
             "sentiment_route": sentiment_route,
             "history_query": history_query,
             "use_diarization": use_diarization,

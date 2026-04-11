@@ -198,3 +198,23 @@ def test_orchestrator_propagates_provider_to_agents() -> None:
     assert result.translation.metadata["provider"] == "qwen"
     assert result.action_items.metadata["provider"] == "qwen"
     assert result.sentiment.metadata["provider"] == "qwen"
+
+
+def test_orchestrator_treats_empty_selected_agents_as_none_selected() -> None:
+    store = FakeStore()
+    orchestrator = MeetingOrchestrator(
+        asr_agent=FakeASR(),
+        summary_agent=FakeSummaryAgent(),
+        translation_agent=FakeTranslationAgent(),
+        action_item_agent=FakeActionItemAgent(),
+        sentiment_agent=FakeSentimentAgent(),
+        vector_store=store,
+    )
+
+    result = orchestrator.run(audio_path="demo.wav", selected_agents=[])
+
+    assert result.selected_agents == []
+    assert result.summary is None
+    assert result.translation is None
+    assert result.action_items is None
+    assert result.sentiment is None
