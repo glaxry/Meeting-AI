@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from meeting_ai.schemas import (
     ActionItem,
     ActionItemPriority,
@@ -14,7 +16,15 @@ from meeting_ai.schemas import (
     TranslationResult,
 )
 import ui.app as app_module
-from ui.app import format_action_items, format_history, format_sentiment, format_summary, format_translation
+from ui.app import (
+    analyze_via_api,
+    format_action_items,
+    format_history,
+    format_sentiment,
+    format_summary,
+    format_translation,
+    parse_glossary,
+)
 
 
 def test_format_action_items_returns_readable_lines() -> None:
@@ -47,23 +57,54 @@ def test_format_history_renders_scores() -> None:
     assert "0.910" in text
 
 
-def test_get_orchestrator_reuses_instance(monkeypatch) -> None:
-    app_module.get_orchestrator.cache_clear()
-    created = []
+def test_parse_glossary_returns_mapping() -> None:
+    assert parse_glossary("语音识别=speech-recognition\n预算=budget") == {
+        "语音识别": "speech-recognition",
+        "预算": "budget",
+    }
 
-    class DummyOrchestrator:
-        def __init__(self, settings) -> None:
-            created.append(settings)
 
-    monkeypatch.setattr(app_module, "MeetingOrchestrator", DummyOrchestrator)
-    try:
-        first = app_module.get_orchestrator()
-        second = app_module.get_orchestrator()
-    finally:
-        app_module.get_orchestrator.cache_clear()
+def test_analyze_via_api_posts_multipart_request(monkeypatch) -> None:
+    audio_path = app_module.ROOT / "data" / "samples" / "asr_example_zh.wav"
+    captured = {}
 
-    assert first is second
-    assert len(created) == 1
+    class DummyResponse:
+        status_code = 200
+        text = "ok"
+
+        def json(self):
+            return MeetingWorkflowResult(selected_agents=[]).model_dump(mode="json")
+
+    def fake_post(url, data, files, timeout):
+        captured["url"] = url
+        captured["data"] = data
+        captured["file_name"] = files["audio"][0]
+        captured["file_open"] = not files["audio"][1].closed
+        captured["timeout"] = timeout
+        return DummyResponse()
+
+    monkeypatch.setattr(app_module.requests, "post", fake_post)
+
+    result = analyze_via_api(
+        str(audio_path),
+        language="zh",
+        provider="deepseek",
+        selected_agents=[],
+        target_language="en",
+        sentiment_route="llm",
+        history_query="last decision",
+        glossary={"语音识别": "speech-recognition"},
+        use_diarization=True,
+        num_speakers=None,
+    )
+
+    assert captured["url"].endswith("/meetings/analyze")
+    assert json.loads(captured["data"]["selected_agents"]) == []
+    assert json.loads(captured["data"]["glossary"]) == {"语音识别": "speech-recognition"}
+    assert captured["file_name"] == "asr_example_zh.wav"
+    assert captured["file_open"] is True
+    assert captured["timeout"] is None
+    assert result.selected_agents == []
 
 
 def test_format_summary_renders_sections() -> None:

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from functools import lru_cache
+import json
 import sys
 from pathlib import Path
 
 import gradio as gr
+import requests
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +14,6 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from meeting_ai.config import get_settings
-from meeting_ai.orchestrator import MeetingOrchestrator
 from meeting_ai.runtime import find_ffmpeg
 from meeting_ai.schemas import ActionItemResult, LLMProvider, MeetingWorkflowResult, SentimentResult, TranslationResult
 
@@ -51,11 +51,6 @@ body, .gradio-container {
 
 def _is_selected(selected_agents: list[str] | None, agent_name: str) -> bool:
     return selected_agents is None or agent_name in selected_agents
-
-
-@lru_cache(maxsize=1)
-def get_orchestrator() -> MeetingOrchestrator:
-    return MeetingOrchestrator(settings=get_settings())
 
 
 def format_transcript(result: MeetingWorkflowResult) -> str:
@@ -190,6 +185,61 @@ def format_diagnostics(result: MeetingWorkflowResult) -> str:
     return "\n".join(lines)
 
 
+def parse_glossary(glossary_text: str) -> dict[str, str]:
+    glossary: dict[str, str] = {}
+    for raw_line in glossary_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if "=" not in line:
+            raise gr.Error(f"Invalid glossary entry: {line}. Use SOURCE=TARGET.")
+        source, target = line.split("=", 1)
+        glossary[source.strip()] = target.strip()
+    return glossary
+
+
+def analyze_via_api(
+    audio_path: str,
+    language: str,
+    provider: str,
+    selected_agents: list[str],
+    target_language: str,
+    sentiment_route: str,
+    history_query: str,
+    glossary: dict[str, str],
+    use_diarization: bool,
+    num_speakers: float | None,
+) -> MeetingWorkflowResult:
+    settings = get_settings()
+    url = f"{settings.api_base_url.rstrip('/')}/meetings/analyze"
+    data = {
+        "language": language,
+        "provider": provider,
+        "selected_agents": json.dumps(selected_agents or [], ensure_ascii=False),
+        "target_language": target_language,
+        "sentiment_route": sentiment_route,
+        "history_query": history_query.strip(),
+        "glossary": json.dumps(glossary, ensure_ascii=False),
+        "use_diarization": str(bool(use_diarization)).lower(),
+    }
+    if num_speakers is not None:
+        data["num_speakers"] = str(int(num_speakers))
+    try:
+        with Path(audio_path).open("rb") as audio_file:
+            response = requests.post(
+                url,
+                data=data,
+                files={"audio": (Path(audio_path).name, audio_file, "application/octet-stream")},
+                timeout=None,
+            )
+    except requests.RequestException as exc:
+        raise gr.Error(f"Meeting AI API request failed. Start the FastAPI backend first: {exc}") from exc
+
+    if response.status_code >= 400:
+        raise gr.Error(f"Meeting AI API returned {response.status_code}: {response.text}")
+    return MeetingWorkflowResult.model_validate(response.json())
+
+
 def run_pipeline(
     audio_path: str | None,
     language: str,
@@ -206,29 +256,20 @@ def run_pipeline(
     if not audio_path:
         raise gr.Error("Upload an audio file first.")
 
-    orchestrator = get_orchestrator()
-    glossary: dict[str, str] = {}
-    for raw_line in glossary_text.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        if "=" not in line:
-            raise gr.Error(f"Invalid glossary entry: {line}. Use SOURCE=TARGET.")
-        source, target = line.split("=", 1)
-        glossary[source.strip()] = target.strip()
+    glossary = parse_glossary(glossary_text)
 
-    progress(0.05, desc="Starting workflow")
-    result = orchestrator.run(
-        audio_path=audio_path,
-        language=language,
-        provider=LLMProvider(provider),
-        selected_agents=selected_agents,
-        target_language=target_language,
-        glossary=glossary,
-        sentiment_route=sentiment_route,
-        history_query=history_query.strip() or None,
-        use_diarization=use_diarization,
-        num_speakers=int(num_speakers) if num_speakers else None,
+    progress(0.05, desc="Calling FastAPI backend")
+    result = analyze_via_api(
+        audio_path,
+        language,
+        provider,
+        selected_agents,
+        target_language,
+        sentiment_route,
+        history_query,
+        glossary,
+        use_diarization,
+        num_speakers,
     )
     progress(1.0, desc="Completed")
 

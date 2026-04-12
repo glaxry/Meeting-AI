@@ -4,7 +4,7 @@
 
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
-- Week 3: LangGraph orchestration, Chroma retrieval, Gradio UI
+- Week 3: LangGraph orchestration, Chroma retrieval, FastAPI backend, Gradio UI
 - Week 3.5: report generation from real workflow artifacts
 - Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
 - Week 5: final report, judge quick start, demo script, and presentation materials
@@ -24,7 +24,8 @@ The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarizati
 - `src/meeting_ai/evaluation.py`: shared evaluation metrics for Week 4
 - `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
 - `src/meeting_ai/final_materials.py`: Week 5 final report and demo-material generation
-- `ui/app.py`: Gradio interface for end-to-end runs
+- `src/meeting_ai/api.py`: FastAPI backend for end-to-end meeting analysis
+- `ui/app.py`: Gradio interface that calls the FastAPI backend
 
 ## Environment Setup
 
@@ -161,7 +162,13 @@ This runs:
 - sentiment
 - Chroma persistence
 
-To launch the UI:
+To launch the FastAPI backend:
+
+```powershell
+uvicorn meeting_ai.api:app --host 127.0.0.1 --port 8000
+```
+
+In a second terminal, launch the Gradio UI:
 
 ```powershell
 python ui\app.py
@@ -248,6 +255,13 @@ Fastest path for evaluators:
 ```powershell
 conda activate meeting-ai-w1
 python scripts/check_env.py
+uvicorn meeting_ai.api:app --host 127.0.0.1 --port 8000
+```
+
+In a second terminal:
+
+```powershell
+conda activate meeting-ai-w1
 python ui\app.py
 ```
 

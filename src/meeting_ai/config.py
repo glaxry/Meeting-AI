@@ -60,6 +60,7 @@ class MeetingAISettings(BaseSettings):
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
     chroma_persist_dir: Path = Field(default=PROJECT_ROOT / "data" / "chroma", alias="CHROMA_PERSIST_DIR")
+    api_base_url: str = Field(default="http://127.0.0.1:8000", alias="MEETING_AI_API_BASE_URL")
     gradio_server_name: str = Field(default="127.0.0.1", alias="GRADIO_SERVER_NAME")
     gradio_server_port: int = Field(default=7860, alias="GRADIO_SERVER_PORT")
 
