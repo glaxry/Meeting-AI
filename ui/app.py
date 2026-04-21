@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import sys
+from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 import gradio as gr
 import pandas as pd
@@ -17,6 +19,7 @@ if str(SRC) not in sys.path:
 from meeting_ai.config import get_settings
 from meeting_ai.runtime import find_ffmpeg
 from meeting_ai.schemas import ActionItemResult, LLMProvider, MeetingWorkflowResult, SentimentResult, TranslationResult
+from meeting_ai.streaming import FunASRStreamingTranscriber, StreamingSessionRegistry
 
 
 APP_CSS = """
@@ -48,6 +51,14 @@ body, .gradio-container {
   color: #334155;
 }
 """
+
+
+STREAMING_SESSIONS = StreamingSessionRegistry()
+
+
+@lru_cache(maxsize=1)
+def get_streaming_transcriber() -> FunASRStreamingTranscriber:
+    return FunASRStreamingTranscriber(settings=get_settings())
 
 
 def _is_selected(selected_agents: list[str] | None, agent_name: str) -> bool:
@@ -329,6 +340,71 @@ def analyze_via_api(
     return MeetingWorkflowResult.model_validate(response.json())
 
 
+def start_streaming_demo(language: str) -> tuple[str, str, dict[str, Any]]:
+    session = STREAMING_SESSIONS.add(get_streaming_transcriber().create_session(language=language))
+    info = session.session_info()
+    status = (
+        f"Streaming session ready | id={info.session_id} | model={info.asr_model} | "
+        f"chunk_size={info.chunk_size} | target_sample_rate={info.target_sample_rate}"
+    )
+    return "", status, {"session_id": info.session_id, "language": language}
+
+
+def process_streaming_audio(
+    audio_chunk: tuple[int, Any] | None,
+    language: str,
+    state: dict[str, Any] | None,
+) -> tuple[str, str, dict[str, Any] | None]:
+    if audio_chunk is None:
+        return "", "Waiting for microphone audio...", state
+    if not isinstance(audio_chunk, tuple) or len(audio_chunk) != 2:
+        raise gr.Error("Streaming audio chunk is invalid. Expected a (sample_rate, samples) tuple.")
+
+    sample_rate, samples = audio_chunk
+    state = state or {}
+    session_id = str(state.get("session_id", "")).strip()
+    session = STREAMING_SESSIONS.get(session_id) if session_id else None
+    if session is None:
+        session = STREAMING_SESSIONS.add(
+            get_streaming_transcriber().create_session(language=language, sample_rate=int(sample_rate))
+        )
+        state = {"session_id": session.session_id, "language": language}
+
+    event = session.process_chunk(samples, sample_rate=int(sample_rate), is_final=False)
+    status = (
+        f"Streaming live | id={event.session_id} | chunk_index={event.chunk_index} | "
+        f"received={event.received_seconds:.2f}s | delta_chars={len(event.delta_text)}"
+    )
+    transcript = event.cumulative_text or "Listening..."
+    return transcript, status, state
+
+
+def stop_streaming_demo(state: dict[str, Any] | None) -> tuple[str, str, None]:
+    if not state:
+        return "", "Streaming session stopped.", None
+    session_id = str(state.get("session_id", "")).strip()
+    if not session_id:
+        return "", "Streaming session stopped.", None
+
+    session = STREAMING_SESSIONS.pop(session_id)
+    if session is None:
+        return "", "Streaming session already cleaned up.", None
+
+    event = session.snapshot(is_final=True)
+    status = (
+        f"Streaming finished | id={event.session_id} | processed={event.received_seconds:.2f}s | "
+        f"transcript_chars={len(event.cumulative_text)}"
+    )
+    return event.cumulative_text or "No transcript emitted.", status, None
+
+
+def reset_streaming_demo(state: dict[str, Any] | None) -> tuple[None, str, str, None]:
+    session_id = str((state or {}).get("session_id", "")).strip()
+    if session_id:
+        STREAMING_SESSIONS.pop(session_id)
+    return None, "", "Streaming session reset.", None
+
+
 def run_pipeline(
     audio_path: str | None,
     language: str,
@@ -480,6 +556,56 @@ def build_app() -> gr.Blocks:
                     diagnostics_text,
                 ],
             )
+
+            with gr.Accordion("Streaming MVP", open=False):
+                gr.Markdown(
+                    """
+                    Live ASR MVP for microphone input. This path uses the FunASR streaming model locally and is separate from the
+                    batch Week 3 workflow above. For application integrations, use the FastAPI WebSocket endpoint at
+                    `/stream/transcribe`.
+                    """
+                )
+                with gr.Row():
+                    stream_language = gr.Dropdown(choices=["zh", "en"], value="zh", label="Streaming Language")
+                    stream_reset = gr.Button("Reset Stream")
+                stream_audio = gr.Audio(
+                    label="Live Audio",
+                    type="numpy",
+                    sources=["microphone"],
+                    streaming=True,
+                )
+                stream_status = gr.Markdown(
+                    f"Ready for live ASR | model={settings.funasr_streaming_model} | "
+                    f"stream_every={settings.streaming_gradio_chunk_seconds:.1f}s"
+                )
+                stream_transcript = gr.Textbox(lines=10, label="Live Transcript")
+                stream_state = gr.State(value=None)
+
+                stream_audio.start_recording(
+                    fn=start_streaming_demo,
+                    inputs=[stream_language],
+                    outputs=[stream_transcript, stream_status, stream_state],
+                    show_progress="hidden",
+                )
+                stream_audio.stream(
+                    fn=process_streaming_audio,
+                    inputs=[stream_audio, stream_language, stream_state],
+                    outputs=[stream_transcript, stream_status, stream_state],
+                    show_progress="hidden",
+                    stream_every=settings.streaming_gradio_chunk_seconds,
+                )
+                stream_audio.stop_recording(
+                    fn=stop_streaming_demo,
+                    inputs=[stream_state],
+                    outputs=[stream_transcript, stream_status, stream_state],
+                    show_progress="hidden",
+                )
+                stream_reset.click(
+                    fn=reset_streaming_demo,
+                    inputs=[stream_state],
+                    outputs=[stream_audio, stream_transcript, stream_status, stream_state],
+                    show_progress="hidden",
+                )
     return app
 
 

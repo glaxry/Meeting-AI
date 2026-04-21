@@ -5,6 +5,7 @@
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
 - Week 3: LangGraph orchestration, Chroma retrieval, FastAPI backend, Gradio UI
+- Streaming MVP: FunASR streaming ASR, FastAPI WebSocket transport, Gradio microphone demo
 - Week 3.5: report generation from real workflow artifacts
 - Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
 - Week 5: final report, judge quick start, demo script, and presentation materials
@@ -27,6 +28,7 @@ The repo should prefer the `meeting-ai-w1` conda environment for local developme
 - `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
 - `src/meeting_ai/final_materials.py`: Week 5 final report and demo-material generation
 - `src/meeting_ai/api.py`: FastAPI backend for end-to-end meeting analysis
+- `src/meeting_ai/streaming.py`: streaming ASR sessions, audio chunk helpers, and demo session registry
 - `ui/app.py`: Gradio interface that calls the FastAPI backend
 
 ## Environment Setup
@@ -67,6 +69,8 @@ Useful defaults already included:
 - `SENTIMENT_TRANSFORMER_MODEL=lxyuan/distilbert-base-multilingual-cased-sentiments-student`
 - `EMBEDDING_MODEL=intfloat/multilingual-e5-small`
 - `FUNASR_MODEL=iic/SenseVoiceSmall`
+- `FUNASR_STREAMING_MODEL=paraformer-zh-streaming`
+- `FUNASR_STREAMING_CHUNK_SIZE=0,10,5`
 - `RETRIEVAL_CHUNK_SIZE=20`
 - `SENTIMENT_TIMELINE_WINDOW_SECONDS=120`
 - `CHROMA_PERSIST_DIR=data/chroma`
@@ -132,7 +136,7 @@ python -m pytest -q
 Expected:
 
 ```text
-34 passed
+58 passed
 ```
 
 ## Week 1 Quick Test
@@ -193,6 +197,7 @@ http://127.0.0.1:7860
 ```
 
 Detailed Week 3 delivery notes are in `reports\week3_documentation.md`.
+Detailed technology/industry analysis notes are in `reports\technology_industry_gap_analysis.md`.
 
 ## Week 3 Workflow Behavior
 
@@ -204,6 +209,42 @@ Detailed Week 3 delivery notes are in `reports\week3_documentation.md`.
 - History retrieval supports `chunk_type` and `meeting_id` metadata filters
 - Action item extraction keeps a short reasoning summary and marks implicit tasks
 - Gradio shows a sentiment timeline chart and a speaker participation chart for the current run
+
+## Streaming MVP Quick Test
+
+Start the API backend first:
+
+```powershell
+uvicorn meeting_ai.api:app --host 127.0.0.1 --port 8000
+```
+
+Option 1: run the WebSocket demo client against the backend:
+
+```powershell
+python scripts/streaming_demo_client.py --audio .\data\samples\asr_example_zh.wav --chunk-seconds 2.0 --print-cumulative
+```
+
+Option 2: launch the Gradio UI and open the `Streaming MVP` accordion:
+
+```powershell
+python ui\app.py
+```
+
+The WebSocket endpoint is:
+
+```text
+ws://127.0.0.1:8000/stream/transcribe
+```
+
+Minimal message flow:
+
+- client -> `{"type":"start","language":"zh","sample_rate":16000}`
+- client -> `{"type":"chunk","audio_base64":"<pcm16-base64>","sample_rate":16000,"is_final":false}`
+- server -> `{"event":"partial","transcript":{...}}`
+- last client chunk sets `is_final=true`
+- server -> `{"event":"final","transcript":{...}}`
+
+Detailed Streaming MVP notes are in `reports\streaming_mvp_documentation.md`.
 
 ## Week 3.5 Report Generation
 
@@ -334,6 +375,7 @@ If a live API path is slow, the repo already contains fallback evidence:
 |   |-- week1_documentation.md
 |   |-- week2_documentation.md
 |   |-- week3_documentation.md
+|   |-- technology_industry_gap_analysis.md
 |   |-- week4_experiments.md
 |   |-- week3_5_progress_report.md
 |   `-- assets

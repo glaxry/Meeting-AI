@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
+
 from meeting_ai.schemas import (
     ActionItem,
     ActionItemPriority,
     ActionItemResult,
     MeetingWorkflowResult,
     RetrievalRecord,
+    StreamingSessionInfo,
+    StreamingTranscriptEvent,
     SentimentLabel,
     SentimentResult,
     SentimentSegment,
@@ -16,6 +20,7 @@ from meeting_ai.schemas import (
     TranscriptSegment,
     TranslationResult,
 )
+from meeting_ai.streaming import StreamingSessionRegistry
 import ui.app as app_module
 from ui.app import (
     analyze_via_api,
@@ -28,6 +33,10 @@ from ui.app import (
     format_transcript,
     format_translation,
     parse_glossary,
+    process_streaming_audio,
+    reset_streaming_demo,
+    start_streaming_demo,
+    stop_streaming_demo,
 )
 
 
@@ -305,3 +314,83 @@ def test_build_speaker_distribution_chart_aggregates_duration_per_speaker() -> N
             "segment_count": 1,
         },
     ]
+
+
+class DummyStreamingSession:
+    def __init__(self, session_id: str) -> None:
+        self.session_id = session_id
+        self.language = "zh"
+        self.sample_rate = 16000
+        self.calls = 0
+
+    def session_info(self):
+        return StreamingSessionInfo(
+            session_id=self.session_id,
+            language=self.language,
+            sample_rate=self.sample_rate,
+            target_sample_rate=16000,
+            asr_model="paraformer-zh-streaming",
+            chunk_size=[0, 10, 5],
+            encoder_chunk_look_back=4,
+            decoder_chunk_look_back=1,
+        )
+
+    def process_chunk(self, samples, *, sample_rate: int | None = None, is_final: bool = False):
+        self.calls += 1
+        return StreamingTranscriptEvent(
+            session_id=self.session_id,
+            chunk_index=self.calls - 1,
+            delta_text="欢迎",
+            cumulative_text="欢迎" if self.calls == 1 else "欢迎大家",
+            is_final=is_final,
+            received_seconds=0.5 * self.calls,
+            sample_rate=sample_rate or self.sample_rate,
+            target_sample_rate=16000,
+        )
+
+    def snapshot(self, *, is_final: bool = False):
+        return StreamingTranscriptEvent(
+            session_id=self.session_id,
+            chunk_index=max(self.calls - 1, 0),
+            delta_text="",
+            cumulative_text="欢迎大家",
+            is_final=is_final,
+            received_seconds=1.0,
+            sample_rate=self.sample_rate,
+            target_sample_rate=16000,
+        )
+
+
+class DummyStreamingTranscriber:
+    def __init__(self) -> None:
+        self.sessions: list[DummyStreamingSession] = []
+
+    def create_session(self, *, language: str = "zh", sample_rate: int | None = None, session_id: str | None = None):
+        session = DummyStreamingSession(session_id or "stream-ui")
+        self.sessions.append(session)
+        return session
+
+
+def test_streaming_demo_callbacks_manage_session_state(monkeypatch) -> None:
+    fake_transcriber = DummyStreamingTranscriber()
+    monkeypatch.setattr(app_module, "get_streaming_transcriber", lambda: fake_transcriber)
+    monkeypatch.setattr(app_module, "STREAMING_SESSIONS", StreamingSessionRegistry())
+
+    transcript, status, state = start_streaming_demo("zh")
+    live_transcript, live_status, state = process_streaming_audio(
+        (16000, np.array([0.0, 0.1, -0.1], dtype=np.float32)),
+        "zh",
+        state,
+    )
+    final_transcript, final_status, final_state = stop_streaming_demo(state)
+    _, cleared_transcript, reset_status, reset_state = reset_streaming_demo(final_state)
+
+    assert transcript == ""
+    assert "Streaming session ready" in status
+    assert live_transcript == "欢迎"
+    assert "chunk_index=0" in live_status
+    assert final_transcript == "欢迎大家"
+    assert "Streaming finished" in final_status
+    assert cleared_transcript == ""
+    assert reset_status == "Streaming session reset."
+    assert reset_state is None

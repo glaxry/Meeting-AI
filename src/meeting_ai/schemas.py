@@ -43,6 +43,30 @@ class TranscriptResult(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class StreamingSessionInfo(BaseModel):
+    session_id: str
+    language: str
+    sample_rate: int
+    target_sample_rate: int
+    asr_model: str
+    chunk_size: list[int] = Field(default_factory=list)
+    encoder_chunk_look_back: int
+    decoder_chunk_look_back: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class StreamingTranscriptEvent(BaseModel):
+    session_id: str
+    chunk_index: int
+    delta_text: str = ""
+    cumulative_text: str = ""
+    is_final: bool = False
+    received_seconds: float
+    sample_rate: int
+    target_sample_rate: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class LLMResponse(BaseModel):
     provider: LLMProvider
     model: str
