@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -36,6 +36,13 @@ class MeetingAISettings(BaseSettings):
     )
     qwen_model: str = Field(default="qwen-plus", alias="QWEN_MODEL")
 
+    langfuse_public_key: str | None = Field(default=None, alias="LANGFUSE_PUBLIC_KEY")
+    langfuse_secret_key: str | None = Field(default=None, alias="LANGFUSE_SECRET_KEY")
+    langfuse_host: str = Field(
+        default="https://cloud.langfuse.com",
+        validation_alias=AliasChoices("LANGFUSE_HOST", "LANGFUSE_BASE_URL"),
+    )
+
     huggingface_token: str | None = Field(default=None, alias="HUGGINGFACE_TOKEN")
     pyannote_model: str = Field(default="pyannote/speaker-diarization-3.1", alias="PYANNOTE_MODEL")
     sentiment_transformer_model: str = Field(
@@ -56,6 +63,7 @@ class MeetingAISettings(BaseSettings):
     llm_retry_backoff_seconds: float = Field(default=1.5, alias="LLM_RETRY_BACKOFF_SECONDS")
     summary_map_reduce_threshold: int = Field(default=500, alias="SUMMARY_MAP_REDUCE_THRESHOLD")
     summary_chunk_target_words: int = Field(default=350, alias="SUMMARY_CHUNK_TARGET_WORDS")
+    retrieval_chunk_size: int = Field(default=20, alias="RETRIEVAL_CHUNK_SIZE")
 
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
@@ -80,6 +88,10 @@ class MeetingAISettings(BaseSettings):
     def resolved_qwen_api_key(self) -> str | None:
         return self.qwen_api_key
 
+    @property
+    def langfuse_enabled(self) -> bool:
+        return bool(self.langfuse_public_key and self.langfuse_secret_key)
+
     def ensure_output_dir(self) -> Path:
         self.default_output_dir.mkdir(parents=True, exist_ok=True)
         return self.default_output_dir
@@ -93,11 +105,14 @@ class MeetingAISettings(BaseSettings):
             "device": self.device,
             "deepseek_key_present": bool(self.resolved_deepseek_api_key),
             "qwen_key_present": bool(self.resolved_qwen_api_key),
+            "langfuse_enabled": self.langfuse_enabled,
+            "langfuse_host": self.langfuse_host if self.langfuse_enabled else None,
             "huggingface_token_present": bool(self.huggingface_token),
             "funasr_model": self.funasr_model,
             "pyannote_model": self.pyannote_model,
             "sentiment_transformer_model": self.sentiment_transformer_model,
             "embedding_model": self.embedding_model,
+            "retrieval_chunk_size": self.retrieval_chunk_size,
             "chroma_persist_dir": str(self.chroma_persist_dir),
         }
 

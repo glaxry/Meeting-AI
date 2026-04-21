@@ -27,6 +27,10 @@ def _summary_to_document(summary: SummaryResult, transcript: TranscriptResult | 
     return "\n".join(lines)
 
 
+def _transcript_window_to_document(transcript_window: list[Any]) -> str:
+    return "\n".join(f"[{segment.speaker}] {segment.text}" for segment in transcript_window)
+
+
 @dataclass
 class SentenceTransformerEmbedder:
     settings: MeetingAISettings
@@ -79,17 +83,12 @@ class MeetingVectorStore:
             )
         return self._collection
 
-    def add_summary(
-        self,
-        summary: SummaryResult,
+    @staticmethod
+    def _base_metadata(
+        resolved_meeting_id: str,
         transcript: TranscriptResult | None = None,
-        meeting_id: str | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> str:
-        collection = self._get_collection()
-        resolved_meeting_id = meeting_id or uuid4().hex
-        document = _summary_to_document(summary, transcript)
-        embedding = self.embedder.encode_texts([document], task="passage")[0]
+    ) -> dict[str, Any]:
         base_metadata: dict[str, Any] = {
             "meeting_id": resolved_meeting_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -99,22 +98,122 @@ class MeetingVectorStore:
             base_metadata["language"] = transcript.language
         if metadata:
             base_metadata.update(metadata)
+        return base_metadata
+
+    def add_meeting_chunks(
+        self,
+        transcript: TranscriptResult,
+        summary: SummaryResult,
+        meeting_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> str:
+        collection = self._get_collection()
+        resolved_meeting_id = meeting_id or uuid4().hex
+        base_metadata = self._base_metadata(
+            resolved_meeting_id=resolved_meeting_id,
+            transcript=transcript,
+            metadata=metadata,
+        )
+
+        documents: list[str] = []
+        ids: list[str] = []
+        metadatas: list[dict[str, Any]] = []
+
+        documents.append(_summary_to_document(summary))
+        ids.append(f"{resolved_meeting_id}_summary")
+        metadatas.append(
+            {
+                **base_metadata,
+                "chunk_type": "summary",
+            }
+        )
+
+        chunk_size = max(1, int(self.settings.retrieval_chunk_size))
+        for chunk_index, start_index in enumerate(range(0, len(transcript.segments), chunk_size)):
+            transcript_window = transcript.segments[start_index : start_index + chunk_size]
+            if not transcript_window:
+                continue
+            documents.append(_transcript_window_to_document(transcript_window))
+            ids.append(f"{resolved_meeting_id}_chunk_{chunk_index}")
+            metadatas.append(
+                {
+                    **base_metadata,
+                    "chunk_type": "transcript",
+                    "chunk_index": chunk_index,
+                    "start_seconds": transcript_window[0].start,
+                    "end_seconds": transcript_window[-1].end,
+                    "speakers": sorted({segment.speaker for segment in transcript_window}),
+                }
+            )
+
+        embeddings = self.embedder.encode_texts(documents, task="passage")
+        collection.upsert(
+            ids=ids,
+            documents=documents,
+            metadatas=metadatas,
+            embeddings=embeddings,
+        )
+        return resolved_meeting_id
+
+    def add_summary(
+        self,
+        summary: SummaryResult,
+        transcript: TranscriptResult | None = None,
+        meeting_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> str:
+        if transcript is not None and transcript.segments:
+            return self.add_meeting_chunks(
+                transcript=transcript,
+                summary=summary,
+                meeting_id=meeting_id,
+                metadata=metadata,
+            )
+
+        collection = self._get_collection()
+        resolved_meeting_id = meeting_id or uuid4().hex
+        document = _summary_to_document(summary)
+        embedding = self.embedder.encode_texts([document], task="passage")[0]
+        base_metadata = self._base_metadata(
+            resolved_meeting_id=resolved_meeting_id,
+            transcript=transcript,
+            metadata=metadata,
+        )
 
         collection.upsert(
-            ids=[resolved_meeting_id],
+            ids=[f"{resolved_meeting_id}_summary"],
             documents=[document],
-            metadatas=[base_metadata],
+            metadatas=[{**base_metadata, "chunk_type": "summary"}],
             embeddings=[embedding],
         )
         return resolved_meeting_id
 
-    def query(self, question: str, top_k: int = 3) -> list[RetrievalRecord]:
+    def query(
+        self,
+        question: str,
+        top_k: int = 3,
+        chunk_type: str | None = None,
+        meeting_id: str | None = None,
+    ) -> list[RetrievalRecord]:
         collection = self._get_collection()
         embedding = self.embedder.encode_texts([question], task="query")[0]
+        filters: list[dict[str, Any]] = []
+        if chunk_type:
+            filters.append({"chunk_type": {"$eq": chunk_type}})
+        if meeting_id:
+            filters.append({"meeting_id": {"$eq": meeting_id}})
+
+        where: dict[str, Any] | None = None
+        if len(filters) == 1:
+            where = filters[0]
+        elif len(filters) > 1:
+            where = {"$and": filters}
+
         result = collection.query(
             query_embeddings=[embedding],
             n_results=top_k,
             include=["documents", "metadatas", "distances"],
+            where=where,
         )
 
         documents = result.get("documents") or [[]]

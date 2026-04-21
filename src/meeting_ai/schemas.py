@@ -75,10 +75,12 @@ class ActionItem(BaseModel):
     deadline: str | None = None
     priority: ActionItemPriority = ActionItemPriority.MEDIUM
     source_quote: str
+    implicit: bool = False
 
 
 class ActionItemResult(BaseModel):
     items: list[ActionItem] = Field(default_factory=list)
+    reasoning: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 

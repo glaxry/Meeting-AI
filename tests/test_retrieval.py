@@ -29,10 +29,25 @@ class FakeCollection:
                 }
             )
 
-    def query(self, query_embeddings, n_results, include):
+    def _matches_where(self, item: dict[str, object], where) -> bool:
+        if where is None:
+            return True
+        if "$and" in where:
+            return all(self._matches_where(item, clause) for clause in where["$and"])
+        metadata = item["metadata"]
+        for key, condition in where.items():
+            if isinstance(condition, dict) and "$eq" in condition:
+                if metadata.get(key) != condition["$eq"]:
+                    return False
+            elif metadata.get(key) != condition:
+                return False
+        return True
+
+    def query(self, query_embeddings, n_results, include, where=None):
         query_vector = query_embeddings[0]
+        filtered = [item for item in self.items if self._matches_where(item, where)]
         ranked = sorted(
-            self.items,
+            filtered,
             key=lambda item: sum(a * b for a, b in zip(item["embedding"], query_vector)),
             reverse=True,
         )[:n_results]
@@ -67,9 +82,12 @@ def test_vector_store_adds_summary_document() -> None:
     )
 
     assert meeting_id == "meeting-1"
-    assert len(collection.items) == 1
+    assert len(collection.items) == 2
+    assert collection.items[0]["metadata"]["chunk_type"] == "summary"
     assert "Topics:" in collection.items[0]["document"]
     assert collection.items[0]["metadata"]["language"] == "en"
+    assert collection.items[1]["metadata"]["chunk_type"] == "transcript"
+    assert collection.items[1]["metadata"]["chunk_index"] == 0
 
 
 def test_vector_store_queries_ranked_results() -> None:
@@ -89,3 +107,37 @@ def test_vector_store_queries_ranked_results() -> None:
 
     assert len(results) == 1
     assert results[0].meeting_id == "launch-meeting"
+
+
+def test_vector_store_queries_can_filter_by_chunk_type_and_meeting_id() -> None:
+    collection = FakeCollection()
+    store = MeetingVectorStore(collection=collection, embedder=FakeEmbedder())
+    store.add_summary(
+        summary=SummaryResult(topics=["Launch"], decisions=["Ship"], follow_ups=[]),
+        transcript=build_transcript(),
+        meeting_id="launch-meeting",
+    )
+    store.add_summary(
+        summary=SummaryResult(topics=["Budget"], decisions=["Cut spend"], follow_ups=[]),
+        meeting_id="budget-meeting",
+    )
+
+    transcript_results = store.query(
+        "What did we discuss about launch?",
+        top_k=3,
+        chunk_type="transcript",
+        meeting_id="launch-meeting",
+    )
+    summary_results = store.query(
+        "What did we decide about budget?",
+        top_k=3,
+        chunk_type="summary",
+        meeting_id="budget-meeting",
+    )
+
+    assert len(transcript_results) == 1
+    assert transcript_results[0].metadata["chunk_type"] == "transcript"
+    assert transcript_results[0].meeting_id == "launch-meeting"
+    assert len(summary_results) == 1
+    assert summary_results[0].metadata["chunk_type"] == "summary"
+    assert summary_results[0].meeting_id == "budget-meeting"

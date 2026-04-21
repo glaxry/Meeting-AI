@@ -22,16 +22,27 @@ LOGGER = logging.getLogger(__name__)
 
 
 ACTION_ITEM_SYSTEM_PROMPT = """You are an action item extraction agent.
+
+Work in TWO steps:
+
+Step 1 - ANALYSIS
+- Review each speaker turn for explicit commitments such as "I will..." or "I'll handle it."
+- Review each speaker turn for implicit obligations, delegated ownership, and follow-up pressure.
+- Review each speaker turn for temporal signals such as deadlines, urgency, or sequencing.
+- Keep this reasoning concise and summarize the most important findings in the `reasoning` field.
+
 Return valid JSON only.
 The output schema must be:
 {
+  "reasoning": "brief summary of the commitments and obligations found",
   "items": [
     {
       "assignee": "name or null",
       "task": "concrete task",
       "deadline": "deadline or null",
       "priority": "low|medium|high",
-      "source_quote": "short supporting quote from the transcript"
+      "source_quote": "short supporting quote from the transcript",
+      "implicit": true
     }
   ]
 }
@@ -41,8 +52,21 @@ Rules:
 - Keep task text concrete and actionable.
 - If no assignee is clear, use null.
 - If no deadline is clear, use null.
+- Set `implicit=true` when the task is inferred rather than directly committed in the quote.
 - Use source_quote as a short verbatim quote supporting the item.
 """
+
+
+def _build_action_item_prompt(chunk_text_value: str, index: int, total_chunks: int) -> str:
+    return (
+        f"Extract action items from meeting chunk {index}/{total_chunks}.\n"
+        "First analyze commitments, implied ownership, and deadlines.\n"
+        "Then return JSON with a short `reasoning` summary and the final `items` array.\n\n"
+        "Example of an implied task:\n"
+        '[SPEAKER_A] This one you sync with the vendor tomorrow.\n'
+        "This should become an action item assigned to SPEAKER_A or the named person if the transcript identifies them.\n\n"
+        f"{chunk_text_value}"
+    )
 
 
 def _deduplicate_items(items: list[ActionItem]) -> list[ActionItem]:
@@ -98,35 +122,38 @@ class ActionItemAgent:
 
         extracted_items: list[ActionItem] = []
         latencies: list[float] = []
+        reasoning_log: list[str] = []
 
         for index, chunk_text_value in enumerate(chunks or [source_text], start=1):
             result, response = prompt_json(
                 llm_client=self.llm_client,
                 provider=self.provider,
                 schema=ActionItemResult,
-                prompt=(
-                    f"Extract action items from meeting chunk {index}/{max(len(chunks), 1)}.\n"
-                    "Pay attention to implied ownership and follow-up obligations.\n\n"
-                    "Example of an implied task:\n"
-                    '[SPEAKER_A] This one you sync with the vendor tomorrow.\n'
-                    "Should become an action item assigned to SPEAKER_A or the named person if the transcript identifies them.\n\n"
-                    f"{chunk_text_value}"
+                prompt=_build_action_item_prompt(
+                    chunk_text_value=chunk_text_value,
+                    index=index,
+                    total_chunks=max(len(chunks), 1),
                 ),
                 system_prompt=ACTION_ITEM_SYSTEM_PROMPT,
                 temperature=0.1,
             )
             extracted_items.extend(result.items)
             latencies.append(response.latency_seconds)
+            if result.reasoning:
+                reasoning_log.append(result.reasoning)
 
         items = _deduplicate_items(extracted_items)
         strategy = "chunked" if len(chunks) > 1 else "single_pass"
         return ActionItemResult(
             items=items,
+            reasoning="\n".join(reasoning_log) if reasoning_log else None,
             metadata={
                 "provider": self.provider.value,
                 "strategy": strategy,
                 "chunk_count": len(chunks) or 1,
                 "latencies": latencies,
+                "reasoning_log": reasoning_log,
+                "implicit_item_count": sum(1 for item in items if item.implicit),
             },
         )
 

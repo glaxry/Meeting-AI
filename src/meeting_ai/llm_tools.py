@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import nullcontext
 import json
 import logging
 import time
@@ -39,6 +40,8 @@ class UnifiedLLMClient:
         self.settings = settings or get_settings()
         self.http_clients = http_clients or {}
         self._clients: dict[LLMProvider, OpenAI] = {}
+        self._langfuse: Any | None = None
+        self._langfuse_attempted = False
 
     def _provider_config(self, provider: LLMProvider) -> ProviderConfig:
         if provider == LLMProvider.DEEPSEEK:
@@ -78,6 +81,71 @@ class UnifiedLLMClient:
                 kwargs["http_client"] = self.http_clients[provider]
             self._clients[provider] = OpenAI(**kwargs)
         return self._clients[provider], config
+
+    def _get_langfuse(self) -> Any | None:
+        if self._langfuse_attempted:
+            return self._langfuse
+        self._langfuse_attempted = True
+
+        if not self.settings.langfuse_enabled:
+            return None
+
+        try:
+            from langfuse import Langfuse
+        except Exception as exc:
+            LOGGER.warning("Langfuse import failed, tracing disabled: %s", exc)
+            return None
+
+        try:
+            self._langfuse = Langfuse(
+                public_key=self.settings.langfuse_public_key,
+                secret_key=self.settings.langfuse_secret_key,
+                host=self.settings.langfuse_host,
+            )
+        except Exception as exc:
+            LOGGER.warning("Langfuse initialization failed, tracing disabled: %s", exc)
+            self._langfuse = None
+        return self._langfuse
+
+    @staticmethod
+    def _model_parameters(
+        *,
+        temperature: float,
+        max_tokens: int | None,
+        response_format: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        parameters: dict[str, Any] = {"temperature": temperature}
+        if max_tokens is not None:
+            parameters["max_tokens"] = max_tokens
+        if response_format is not None:
+            parameters["response_format"] = response_format
+        return parameters
+
+    @staticmethod
+    def _usage_details(response: Any) -> dict[str, int]:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return {}
+        details: dict[str, int] = {}
+        for source_key, target_key in [
+            ("prompt_tokens", "prompt_tokens"),
+            ("completion_tokens", "completion_tokens"),
+            ("total_tokens", "total_tokens"),
+        ]:
+            value = getattr(usage, source_key, None)
+            if value is None:
+                continue
+            details[target_key] = int(value)
+        return details
+
+    @staticmethod
+    def _safe_langfuse_update(generation: Any, **kwargs) -> None:
+        if generation is None:
+            return
+        try:
+            generation.update(**kwargs)
+        except Exception as exc:
+            LOGGER.warning("Langfuse update failed, continuing without trace enrichment: %s", exc)
 
     def _request_with_retry(
         self,
@@ -126,33 +194,63 @@ class UnifiedLLMClient:
             for message in messages
         ]
         client, config = self._get_client(provider)
+        langfuse = self._get_langfuse()
+        trace_context = nullcontext(None)
+        if langfuse is not None:
+            try:
+                trace_context = langfuse.start_as_current_observation(
+                    as_type="generation",
+                    name="llm.chat",
+                    model=config.model,
+                    input=[message.model_dump() for message in normalized_messages],
+                    metadata={"provider": provider.value, "base_url": config.base_url},
+                    model_parameters=self._model_parameters(
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        response_format=response_format,
+                    ),
+                )
+            except Exception as exc:
+                LOGGER.warning("Langfuse trace creation failed, continuing without tracing: %s", exc)
 
-        started = time.perf_counter()
-        response = self._request_with_retry(
-            client=client,
-            model=config.model,
-            messages=normalized_messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            response_format=response_format,
-        )
-        latency = round(time.perf_counter() - started, 3)
+        with trace_context as generation:
+            started = time.perf_counter()
+            try:
+                response = self._request_with_retry(
+                    client=client,
+                    model=config.model,
+                    messages=normalized_messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    response_format=response_format,
+                )
+                latency = round(time.perf_counter() - started, 3)
 
-        message_content = response.choices[0].message.content
-        if isinstance(message_content, str):
-            content = message_content
-        elif message_content is None:
-            content = ""
-        else:
-            content = json.dumps(message_content, ensure_ascii=False)
+                message_content = response.choices[0].message.content
+                if isinstance(message_content, str):
+                    content = message_content
+                elif message_content is None:
+                    content = ""
+                else:
+                    content = json.dumps(message_content, ensure_ascii=False)
 
-        return LLMResponse(
-            provider=provider,
-            model=config.model,
-            content=content,
-            latency_seconds=latency,
-            raw=response.model_dump(),
-        )
+                self._safe_langfuse_update(
+                    generation,
+                    output=content,
+                    usage_details=self._usage_details(response),
+                    metadata={"latency_seconds": latency},
+                )
+
+                return LLMResponse(
+                    provider=provider,
+                    model=config.model,
+                    content=content,
+                    latency_seconds=latency,
+                    raw=response.model_dump(),
+                )
+            except Exception as exc:
+                self._safe_langfuse_update(generation, level="ERROR", status_message=str(exc))
+                raise
 
     def prompt(
         self,

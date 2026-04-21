@@ -54,6 +54,9 @@ Copy `.env.example` to `.env` and fill in:
 ```env
 DEEPSEEK_API_KEY=
 QWEN_API_KEY=
+LANGFUSE_PUBLIC_KEY=
+LANGFUSE_SECRET_KEY=
+LANGFUSE_HOST=https://cloud.langfuse.com
 HUGGINGFACE_TOKEN=
 ```
 
@@ -61,6 +64,7 @@ Useful defaults already included:
 
 - `SENTIMENT_TRANSFORMER_MODEL=lxyuan/distilbert-base-multilingual-cased-sentiments-student`
 - `EMBEDDING_MODEL=intfloat/multilingual-e5-small`
+- `RETRIEVAL_CHUNK_SIZE=20`
 - `CHROMA_PERSIST_DIR=data/chroma`
 
 DeepSeek key lookup order:
@@ -185,8 +189,10 @@ http://127.0.0.1:7860
 - Orchestrator uses `LangGraph StateGraph`
 - Agents can be selected selectively
 - One agent failing does not stop the others
-- Meeting summaries are stored in Chroma automatically
-- History retrieval reads from stored summaries
+- LLM calls can be traced to Langfuse when credentials are configured
+- Meeting storage writes one summary record plus transcript chunks into Chroma automatically
+- History retrieval supports `chunk_type` and `meeting_id` metadata filters
+- Action item extraction keeps a short reasoning summary and marks implicit tasks
 
 ## Week 3.5 Report Generation
 
