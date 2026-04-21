@@ -19,6 +19,8 @@ from meeting_ai.schemas import (
 import ui.app as app_module
 from ui.app import (
     analyze_via_api,
+    build_sentiment_chart,
+    build_speaker_distribution_chart,
     format_action_items,
     format_history,
     format_sentiment,
@@ -232,3 +234,74 @@ def test_format_sentiment_includes_timeline_snapshot_lines() -> None:
 
 def test_format_action_items_respects_unselected_agent() -> None:
     assert format_action_items(ActionItemResult(), selected_agents=["summary"]) == "Action item extraction was not selected."
+
+
+def test_build_sentiment_chart_prefers_timeline_snapshots() -> None:
+    result = SentimentResult(
+        route="transformer",
+        overall_tone=SentimentLabel.TENSION,
+        segments=[
+            SentimentSegment(
+                text="This delay is a serious risk.",
+                sentiment=SentimentLabel.TENSION,
+                confidence=0.88,
+                speaker="SPEAKER_01",
+                start=2.0,
+                end=3.0,
+            )
+        ],
+        timeline=[
+            {
+                "window_start": 0.0,
+                "window_end": 120.0,
+                "dominant_label": "tension",
+                "label_distribution": {"tension": 1.0},
+                "speakers_involved": ["SPEAKER_01"],
+            }
+        ],
+    )
+
+    chart = build_sentiment_chart(result)
+
+    assert chart is not None
+    assert chart.to_dict(orient="records") == [
+        {
+            "time_seconds": 60.0,
+            "sentiment_score": -2.0,
+            "label": "tension",
+        }
+    ]
+
+
+def test_build_speaker_distribution_chart_aggregates_duration_per_speaker() -> None:
+    result = MeetingWorkflowResult(
+        transcript=TranscriptResult(
+            audio_path="demo.wav",
+            language="zh",
+            asr_model="iic/SenseVoiceSmall",
+            diarization_backend="mock",
+            segments=[
+                TranscriptSegment(speaker="SPEAKER_00", text="hello", start=0.0, end=1.5),
+                TranscriptSegment(speaker="SPEAKER_01", text="world", start=1.5, end=3.0),
+                TranscriptSegment(speaker="SPEAKER_00", text="again", start=3.0, end=5.0),
+            ],
+            full_text="[SPEAKER_00] hello",
+            metadata={},
+        )
+    )
+
+    chart = build_speaker_distribution_chart(result)
+
+    assert chart is not None
+    assert chart.to_dict(orient="records") == [
+        {
+            "speaker": "SPEAKER_00",
+            "duration_seconds": 3.5,
+            "segment_count": 2,
+        },
+        {
+            "speaker": "SPEAKER_01",
+            "duration_seconds": 1.5,
+            "segment_count": 1,
+        },
+    ]

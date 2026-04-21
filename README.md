@@ -192,6 +192,8 @@ Then open:
 http://127.0.0.1:7860
 ```
 
+Detailed Week 3 delivery notes are in `reports\week3_documentation.md`.
+
 ## Week 3 Workflow Behavior
 
 - Orchestrator uses `LangGraph StateGraph`
@@ -201,6 +203,7 @@ http://127.0.0.1:7860
 - Meeting storage writes one summary record plus transcript chunks into Chroma automatically
 - History retrieval supports `chunk_type` and `meeting_id` metadata filters
 - Action item extraction keeps a short reasoning summary and marks implicit tasks
+- Gradio shows a sentiment timeline chart and a speaker participation chart for the current run
 
 ## Week 3.5 Report Generation
 
@@ -330,6 +333,7 @@ If a live API path is slow, the repo already contains fallback evidence:
 |   |-- final_project_report.md
 |   |-- week1_documentation.md
 |   |-- week2_documentation.md
+|   |-- week3_documentation.md
 |   |-- week4_experiments.md
 |   |-- week3_5_progress_report.md
 |   `-- assets

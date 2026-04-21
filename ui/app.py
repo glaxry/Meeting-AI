@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import gradio as gr
+import pandas as pd
 import requests
 
 
@@ -149,6 +150,71 @@ def format_sentiment(result: SentimentResult | None, selected_agents: list[str] 
                 f"{snapshot.dominant_label.value} | speakers={speakers} | {distribution}"
             )
     return "\n".join(lines)
+
+
+def build_sentiment_chart(result: SentimentResult | None):
+    if result is None:
+        return None
+
+    label_map = {
+        "agreement": 1.0,
+        "neutral": 0.0,
+        "hesitation": -0.5,
+        "disagreement": -1.0,
+        "tension": -2.0,
+    }
+    rows: list[dict[str, object]] = []
+
+    if result.timeline:
+        for snapshot in result.timeline:
+            midpoint = round((snapshot.window_start + snapshot.window_end) / 2, 3)
+            rows.append(
+                {
+                    "time_seconds": midpoint,
+                    "sentiment_score": label_map.get(snapshot.dominant_label.value, 0.0),
+                    "label": snapshot.dominant_label.value,
+                }
+            )
+    else:
+        for index, segment in enumerate(result.segments):
+            time_seconds = segment.start if segment.start is not None else float(index)
+            rows.append(
+                {
+                    "time_seconds": round(float(time_seconds), 3),
+                    "sentiment_score": label_map.get(segment.sentiment.value, 0.0),
+                    "label": segment.sentiment.value,
+                }
+            )
+
+    if not rows:
+        return None
+    return pd.DataFrame(rows)
+
+
+def build_speaker_distribution_chart(result: MeetingWorkflowResult):
+    transcript = result.transcript
+    if transcript is None or not transcript.segments:
+        return None
+
+    distribution: dict[str, dict[str, float | int]] = {}
+    for segment in transcript.segments:
+        speaker = segment.speaker or "UNKNOWN"
+        duration = max(segment.end - segment.start, 0.0)
+        speaker_bucket = distribution.setdefault(
+            speaker,
+            {
+                "speaker": speaker,
+                "duration_seconds": 0.0,
+                "segment_count": 0,
+            },
+        )
+        speaker_bucket["duration_seconds"] = round(float(speaker_bucket["duration_seconds"]) + duration, 3)
+        speaker_bucket["segment_count"] = int(speaker_bucket["segment_count"]) + 1
+
+    if not distribution:
+        return None
+    rows = sorted(distribution.values(), key=lambda item: (-float(item["duration_seconds"]), str(item["speaker"])))
+    return pd.DataFrame(rows)
 
 
 def format_history(result: MeetingWorkflowResult) -> str:
@@ -308,6 +374,8 @@ def run_pipeline(
         format_action_items(result.action_items, result.selected_agents),
         format_translation(result.translation, result.selected_agents),
         format_sentiment(result.sentiment, result.selected_agents),
+        build_sentiment_chart(result.sentiment),
+        build_speaker_distribution_chart(result),
         format_history(result),
         format_diagnostics(result),
     )
@@ -358,6 +426,13 @@ def build_app() -> gr.Blocks:
             with gr.Tabs():
                 with gr.Tab("Transcript"):
                     transcript_text = gr.Textbox(lines=14, label="Transcript")
+                    speaker_distribution_chart = gr.BarPlot(
+                        x="speaker",
+                        y="duration_seconds",
+                        title="Speaker Participation",
+                        x_title="Speaker",
+                        y_title="Duration (s)",
+                    )
                 with gr.Tab("Summary"):
                     summary_text = gr.Textbox(lines=14, label="Summary")
                 with gr.Tab("Action Items"):
@@ -366,6 +441,13 @@ def build_app() -> gr.Blocks:
                     translation_text = gr.Textbox(lines=14, label="Translation")
                 with gr.Tab("Sentiment"):
                     sentiment_text = gr.Textbox(lines=14, label="Sentiment")
+                    sentiment_chart = gr.LinePlot(
+                        x="time_seconds",
+                        y="sentiment_score",
+                        title="Sentiment Timeline",
+                        x_title="Time (s)",
+                        y_title="Sentiment score",
+                    )
                 with gr.Tab("History"):
                     history_text = gr.Textbox(lines=14, label="History Retrieval")
                 with gr.Tab("Diagnostics"):
@@ -392,6 +474,8 @@ def build_app() -> gr.Blocks:
                     action_items_text,
                     translation_text,
                     sentiment_text,
+                    sentiment_chart,
+                    speaker_distribution_chart,
                     history_text,
                     diagnostics_text,
                 ],
