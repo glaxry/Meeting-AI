@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from meeting_ai.asr_agent import (
+    MeetingASRAgent,
     _funasr_generate_kwargs,
     _funasr_model_kwargs,
     _sensevoice_language_hint,
@@ -8,7 +11,7 @@ from meeting_ai.asr_agent import (
     normalize_sentence_info,
 )
 from meeting_ai.config import get_settings
-from meeting_ai.schemas import DiarizationSegment
+from meeting_ai.schemas import DiarizationSegment, TranscriptSegment
 
 
 def test_normalize_sentence_info_converts_milliseconds() -> None:
@@ -105,3 +108,82 @@ def test_normalize_sentence_info_reads_explicit_emotion_and_event_fields() -> No
 
     assert segments[0].emotion == "happy"
     assert segments[0].event == "applause"
+
+
+class FakeTranscriber:
+    def transcribe(self, audio_path, language, audio_duration):
+        return (
+            [
+                TranscriptSegment(speaker="SPEAKER_A", text="Budget first.", start=0.0, end=1.5),
+                TranscriptSegment(speaker="SPEAKER_B", text="Ship next week.", start=1.5, end=3.0),
+            ],
+            {"asr_runtime_seconds": 1.2},
+        )
+
+
+class FakeDiarizer:
+    enabled = True
+
+    def diarize(self, path, num_speakers=None, min_speakers=None, max_speakers=None):
+        return (
+            [
+                DiarizationSegment(speaker="SPEAKER_A", start=0.0, end=1.5),
+                DiarizationSegment(speaker="SPEAKER_B", start=1.5, end=3.0),
+            ],
+            {"diarization_runtime_seconds": 0.5},
+        )
+
+
+class FakeRegistry:
+    def get_profile_count(self):
+        return 2
+
+
+class FakeVoiceprintIdentifier:
+    def __init__(self):
+        self.registry = FakeRegistry()
+
+    def identify(self, *, audio_path, diarization_segments):
+        return {
+            "SPEAKER_A": {
+                "matched_name": "Alice",
+                "score": 0.93,
+                "threshold": 0.65,
+                "status": "matched",
+                "profile_count": 2,
+                "duration_seconds": 1.5,
+                "segment_count": 1,
+            },
+            "SPEAKER_B": {
+                "matched_name": None,
+                "score": 0.31,
+                "threshold": 0.65,
+                "status": "unknown",
+                "profile_count": 2,
+                "duration_seconds": 1.5,
+                "segment_count": 1,
+            },
+        }
+
+
+def test_meeting_asr_agent_applies_voiceprint_identity_matches() -> None:
+    settings = get_settings().model_copy(update={"use_gpu": False})
+    agent = MeetingASRAgent(
+        settings=settings,
+        transcriber=FakeTranscriber(),
+        diarizer=FakeDiarizer(),
+        voiceprint_identifier=FakeVoiceprintIdentifier(),
+    )
+
+    result = agent.transcribe(
+        audio_path=Path("data/samples/asr_example_zh.wav"),
+        language="zh",
+        enable_voiceprint=True,
+    )
+
+    assert result.segments[0].speaker == "Alice"
+    assert result.segments[0].metadata["original_speaker_label"] == "SPEAKER_A"
+    assert result.segments[0].metadata["speaker_identity_name"] == "Alice"
+    assert result.segments[1].speaker == "SPEAKER_B"
+    assert result.metadata["voiceprint"]["matched_speakers"] == 1
+    assert result.metadata["voiceprint"]["unknown_speakers"] == 1

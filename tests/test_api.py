@@ -106,6 +106,7 @@ def test_analyze_meeting_endpoint_preserves_request_options(monkeypatch) -> None
             "glossary": '{"budget": "budget-cn"}',
             "use_diarization": "false",
             "num_speakers": "2",
+            "enable_voiceprint": "true",
         },
     )
 
@@ -118,6 +119,7 @@ def test_analyze_meeting_endpoint_preserves_request_options(monkeypatch) -> None
     assert fake.kwargs["history_query"] == "previous decision"
     assert fake.kwargs["use_diarization"] is False
     assert fake.kwargs["num_speakers"] == 2
+    assert fake.kwargs["enable_voiceprint"] is True
 
 
 def test_analyze_meeting_rejects_invalid_selected_agents(monkeypatch) -> None:

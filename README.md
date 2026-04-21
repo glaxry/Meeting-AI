@@ -7,6 +7,7 @@
 - Week 3: LangGraph orchestration, Chroma retrieval, FastAPI backend, Gradio UI
 - Retrieval Upgrade: hybrid dense + BM25 retrieval with CrossEncoder reranking
 - Streaming MVP: FunASR streaming ASR, FastAPI WebSocket transport, Gradio microphone demo
+- Speaker Identity MVP: voiceprint enrollment and known-speaker mapping on top of diarization
 - Week 3.5: report generation from real workflow artifacts
 - Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
 - Week 5: final report, judge quick start, demo script, and presentation materials
@@ -24,6 +25,7 @@ The repo should prefer the `meeting-ai-w1` conda environment for local developme
 - `sentiment_agent.py`: `llm` and `transformer` routes with unified schema
 - `orchestrator.py`: Week 3 LangGraph workflow
 - `src/meeting_ai/retrieval.py`: Chroma + dense/BM25 hybrid retrieval with CrossEncoder reranking
+- `src/meeting_ai/voiceprint.py`: voiceprint enrollment, speaker embedding matching, and transcript relabeling
 - `src/meeting_ai/reporting.py`: Week 3.5 report and SVG asset generation
 - `src/meeting_ai/evaluation.py`: shared evaluation metrics for Week 4
 - `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
@@ -74,6 +76,8 @@ Useful defaults already included:
 - `RETRIEVAL_RERANKER_MODEL=BAAI/bge-reranker-base`
 - `FUNASR_STREAMING_MODEL=paraformer-zh-streaming`
 - `FUNASR_STREAMING_CHUNK_SIZE=0,10,5`
+- `VOICEPRINT_MODEL=speechbrain/spkrec-ecapa-voxceleb`
+- `VOICEPRINT_MATCH_THRESHOLD=0.65`
 - `RETRIEVAL_CHUNK_SIZE=20`
 - `SENTIMENT_TIMELINE_WINDOW_SECONDS=120`
 - `CHROMA_PERSIST_DIR=data/chroma`
@@ -122,6 +126,7 @@ Expected highlights:
 - `ffmpeg_path` is not `null`
 - `imports.funasr.ok: true`
 - `imports.pyannote.audio.ok: true`
+- `imports.speechbrain.ok: true`
 - `imports.transformers.ok: true`
 - `imports.gradio.ok: true`
 - `imports.chromadb.ok: true`
@@ -140,7 +145,7 @@ python -m pytest -q
 Expected:
 
 ```text
-59 passed
+62 passed
 ```
 
 ## Week 1 Quick Test
@@ -152,6 +157,28 @@ python scripts/week1_demo.py --audio .\data\samples\asr_example_zh.wav --provide
 ```
 
 Detailed Week 1 delivery notes are in `reports\week1_documentation.md`.
+
+## Speaker Identity Quick Test
+
+Enroll a reference speaker first:
+
+```powershell
+python scripts/enroll_voiceprint.py --name DemoSpeaker --audio .\data\samples\asr_example_zh.wav --overwrite
+```
+
+Then run ASR with diarization plus voiceprint mapping:
+
+```powershell
+python asr_agent.py --audio .\data\samples\asr_example_zh.wav --num-speakers 1 --enable-voiceprint --output .\data\outputs\voiceprint_demo.json
+```
+
+Or use the Week 3 demo path:
+
+```powershell
+python scripts/week3_demo.py --audio .\data\samples\asr_example_zh.wav --num-speakers 1 --enable-voiceprint
+```
+
+Detailed speaker identity notes are in `reports\voiceprint_documentation.md`.
 
 ## Week 2 Quick Test
 
@@ -214,6 +241,7 @@ Detailed technology/industry analysis notes are in `reports\technology_industry_
 - Retrieval now defaults to `hybrid` mode: dense Chroma candidates + BM25 lexical candidates merged by RRF
 - A `BAAI/bge-reranker-base` CrossEncoder reranks the merged candidate pool before returning top hits
 - Action item extraction keeps a short reasoning summary and marks implicit tasks
+- Diarized speakers can optionally be mapped to enrolled identities using `speechbrain/spkrec-ecapa-voxceleb`
 - Gradio shows a sentiment timeline chart and a speaker participation chart for the current run
 
 ## Hybrid Retrieval Quick Test

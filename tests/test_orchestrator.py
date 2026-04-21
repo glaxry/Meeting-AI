@@ -31,7 +31,11 @@ def build_transcript() -> TranscriptResult:
 
 
 class FakeASR:
+    def __init__(self):
+        self.kwargs = {}
+
     def transcribe(self, **kwargs):
+        self.kwargs = kwargs
         return build_transcript()
 
 
@@ -126,8 +130,9 @@ class FakeStore:
 
 def test_orchestrator_runs_selected_agents_and_persists_summary() -> None:
     store = FakeStore()
+    asr = FakeASR()
     orchestrator = MeetingOrchestrator(
-        asr_agent=FakeASR(),
+        asr_agent=asr,
         summary_agent=FakeSummaryAgent(),
         translation_agent=FakeTranslationAgent(),
         action_item_agent=FakeActionItemAgent(),
@@ -139,6 +144,7 @@ def test_orchestrator_runs_selected_agents_and_persists_summary() -> None:
         audio_path="demo.wav",
         selected_agents=["summary", "action_items"],
         history_query="What did we decide last time?",
+        enable_voiceprint=True,
     )
 
     assert result.transcript is not None
@@ -149,6 +155,7 @@ def test_orchestrator_runs_selected_agents_and_persists_summary() -> None:
     assert result.history[0].meeting_id == "previous-1"
     assert result.metadata["stored_meeting_id"] == "stored-1"
     assert store.stored == ["Ship next Tuesday"]
+    assert asr.kwargs["enable_voiceprint"] is True
 
 
 def test_orchestrator_isolates_agent_errors() -> None:

@@ -37,6 +37,7 @@ class WorkflowState(TypedDict, total=False):
     history_query: str | None
     use_diarization: bool
     num_speakers: int | None
+    enable_voiceprint: bool
     persist_summary: bool
     transcript: Any
     summary: Any
@@ -121,6 +122,7 @@ class MeetingOrchestrator:
             language=state.get("language", "zh"),
             use_diarization=state.get("use_diarization", True),
             num_speakers=state.get("num_speakers"),
+            enable_voiceprint=state.get("enable_voiceprint", False),
         )
         return {"transcript": transcript}
 
@@ -199,6 +201,7 @@ class MeetingOrchestrator:
         history_query: str | None = None,
         use_diarization: bool = True,
         num_speakers: int | None = None,
+        enable_voiceprint: bool = False,
         persist_summary: bool = True,
     ) -> MeetingWorkflowResult:
         started = time.perf_counter()
@@ -215,6 +218,7 @@ class MeetingOrchestrator:
             "history_query": history_query,
             "use_diarization": use_diarization,
             "num_speakers": num_speakers,
+            "enable_voiceprint": enable_voiceprint,
             "persist_summary": persist_summary,
             "errors": {},
             "metadata": {},
@@ -261,6 +265,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--history-query", help="Optional query against stored meeting history.")
     parser.add_argument("--num-speakers", type=int)
     parser.add_argument("--disable-diarization", action="store_true")
+    parser.add_argument("--enable-voiceprint", action="store_true")
     parser.add_argument("--output", help="Optional JSON output path.")
     return parser
 
@@ -279,6 +284,7 @@ def main() -> None:
         history_query=args.history_query,
         use_diarization=not args.disable_diarization,
         num_speakers=args.num_speakers,
+        enable_voiceprint=args.enable_voiceprint,
     )
     payload = result.model_dump_json(indent=2)
     if args.output:

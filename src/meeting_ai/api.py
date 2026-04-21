@@ -62,6 +62,7 @@ async def analyze_meeting(
     glossary: str = Form("{}"),
     use_diarization: bool = Form(True),
     num_speakers: int | None = Form(None),
+    enable_voiceprint: bool = Form(False),
 ) -> MeetingWorkflowResult:
     agent_list = _parse_json_field(selected_agents, list, "selected_agents")
     glossary_dict = _parse_json_field(glossary, dict, "glossary")
@@ -88,6 +89,7 @@ async def analyze_meeting(
             history_query=history_query.strip() or None,
             use_diarization=use_diarization,
             num_speakers=num_speakers,
+            enable_voiceprint=enable_voiceprint,
         )
     finally:
         await audio.close()

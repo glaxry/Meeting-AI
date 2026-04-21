@@ -18,6 +18,8 @@ __all__ = [
     "SummaryAgent",
     "TranslationAgent",
     "UnifiedLLMClient",
+    "VoiceprintIdentifier",
+    "VoiceprintRegistry",
     "Week5Artifacts",
     "export_week5_materials",
 ]
@@ -33,6 +35,8 @@ _EXPORTS = {
     "SummaryAgent": (".summary_agent", "SummaryAgent"),
     "TranslationAgent": (".translation_agent", "TranslationAgent"),
     "UnifiedLLMClient": (".llm_tools", "UnifiedLLMClient"),
+    "VoiceprintIdentifier": (".voiceprint", "VoiceprintIdentifier"),
+    "VoiceprintRegistry": (".voiceprint", "VoiceprintRegistry"),
     "Week5Artifacts": (".final_materials", "Week5Artifacts"),
     "export_week5_materials": (".final_materials", "export_week5_materials"),
 }
@@ -60,3 +64,4 @@ if TYPE_CHECKING:
     from .sentiment_agent import SentimentAgent
     from .summary_agent import SummaryAgent
     from .translation_agent import TranslationAgent
+    from .voiceprint import VoiceprintIdentifier, VoiceprintRegistry

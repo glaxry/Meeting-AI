@@ -79,6 +79,13 @@ def format_transcript(result: MeetingWorkflowResult) -> str:
         speaker_confidence = segment.metadata.get("speaker_confidence")
         if speaker_confidence:
             annotations.append(f"speaker_confidence={speaker_confidence}")
+        speaker_identity_name = segment.metadata.get("speaker_identity_name")
+        speaker_identity_score = segment.metadata.get("speaker_identity_score")
+        if speaker_identity_name:
+            if speaker_identity_score is None:
+                annotations.append(f"identity={speaker_identity_name}")
+            else:
+                annotations.append(f"identity={speaker_identity_name} ({float(speaker_identity_score):.3f})")
         suffix = f" | {' | '.join(annotations)}" if annotations else ""
         lines.append(f"{segment.start:>7.2f}s - {segment.end:>7.2f}s | {segment.speaker} | {segment.text}{suffix}")
     return "\n".join(lines) or result.transcript.full_text or "No transcript text."
@@ -280,6 +287,7 @@ def format_diagnostics(result: MeetingWorkflowResult) -> str:
                 f"- diarization runtime: {result.transcript.metadata.get('diarization_runtime_seconds', 'n/a')}s",
                 f"- diarization backend: {result.transcript.diarization_backend}",
                 f"- low-confidence speaker assignments: {result.transcript.metadata.get('speaker_confidence_low_count', 0)}",
+                f"- voiceprint matched speakers: {result.transcript.metadata.get('voiceprint', {}).get('matched_speakers', 0)}",
             ]
         )
     return "\n".join(lines)
@@ -309,6 +317,7 @@ def analyze_via_api(
     glossary: dict[str, str],
     use_diarization: bool,
     num_speakers: float | None,
+    enable_voiceprint: bool,
 ) -> MeetingWorkflowResult:
     settings = get_settings()
     url = f"{settings.api_base_url.rstrip('/')}/meetings/analyze"
@@ -321,6 +330,7 @@ def analyze_via_api(
         "history_query": history_query.strip(),
         "glossary": json.dumps(glossary, ensure_ascii=False),
         "use_diarization": str(bool(use_diarization)).lower(),
+        "enable_voiceprint": str(bool(enable_voiceprint)).lower(),
     }
     if num_speakers is not None:
         data["num_speakers"] = str(int(num_speakers))
@@ -416,6 +426,7 @@ def run_pipeline(
     glossary_text: str,
     use_diarization: bool,
     num_speakers: float | None,
+    enable_voiceprint: bool,
     progress: gr.Progress = gr.Progress(),
 ):
     if not audio_path:
@@ -435,6 +446,7 @@ def run_pipeline(
         glossary,
         use_diarization,
         num_speakers,
+        enable_voiceprint,
     )
     progress(1.0, desc="Completed")
 
@@ -488,6 +500,7 @@ def build_app() -> gr.Blocks:
                 )
                 with gr.Column():
                     use_diarization = gr.Checkbox(value=True, label="Enable Diarization")
+                    enable_voiceprint = gr.Checkbox(value=False, label="Enable Voiceprint Identity")
                     num_speakers = gr.Number(value=None, precision=0, label="Known Speaker Count")
                     history_query = gr.Textbox(label="History Query", placeholder="上次这个问题是怎么决定的？")
                     glossary_text = gr.Textbox(
@@ -542,6 +555,7 @@ def build_app() -> gr.Blocks:
                     glossary_text,
                     use_diarization,
                     num_speakers,
+                    enable_voiceprint,
                 ],
                 outputs=[
                     status,

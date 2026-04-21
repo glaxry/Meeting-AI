@@ -45,6 +45,10 @@ class MeetingAISettings(BaseSettings):
 
     huggingface_token: str | None = Field(default=None, alias="HUGGINGFACE_TOKEN")
     pyannote_model: str = Field(default="pyannote/speaker-diarization-3.1", alias="PYANNOTE_MODEL")
+    voiceprint_model: str = Field(default="speechbrain/spkrec-ecapa-voxceleb", alias="VOICEPRINT_MODEL")
+    voiceprint_match_threshold: float = Field(default=0.65, alias="VOICEPRINT_MATCH_THRESHOLD")
+    voiceprint_min_segment_seconds: float = Field(default=0.5, alias="VOICEPRINT_MIN_SEGMENT_SECONDS")
+    voiceprint_min_total_seconds: float = Field(default=1.5, alias="VOICEPRINT_MIN_TOTAL_SECONDS")
     sentiment_transformer_model: str = Field(
         default="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
         alias="SENTIMENT_TRANSFORMER_MODEL",
@@ -88,6 +92,11 @@ class MeetingAISettings(BaseSettings):
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
     chroma_persist_dir: Path = Field(default=PROJECT_ROOT / "data" / "chroma", alias="CHROMA_PERSIST_DIR")
+    voiceprint_dir: Path = Field(default=PROJECT_ROOT / "data" / "voiceprints", alias="VOICEPRINT_DIR")
+    voiceprint_model_cache_dir: Path = Field(
+        default=PROJECT_ROOT / "data" / "voiceprints" / "_model_cache",
+        alias="VOICEPRINT_MODEL_CACHE_DIR",
+    )
     api_base_url: str = Field(default="http://127.0.0.1:8000", alias="MEETING_AI_API_BASE_URL")
     gradio_server_name: str = Field(default="127.0.0.1", alias="GRADIO_SERVER_NAME")
     gradio_server_port: int = Field(default=7860, alias="GRADIO_SERVER_PORT")
@@ -130,6 +139,14 @@ class MeetingAISettings(BaseSettings):
         self.chroma_persist_dir.mkdir(parents=True, exist_ok=True)
         return self.chroma_persist_dir
 
+    def ensure_voiceprint_dir(self) -> Path:
+        self.voiceprint_dir.mkdir(parents=True, exist_ok=True)
+        return self.voiceprint_dir
+
+    def ensure_voiceprint_model_cache_dir(self) -> Path:
+        self.voiceprint_model_cache_dir.mkdir(parents=True, exist_ok=True)
+        return self.voiceprint_model_cache_dir
+
     def redacted_summary(self) -> dict[str, object]:
         return {
             "device": self.device,
@@ -142,6 +159,8 @@ class MeetingAISettings(BaseSettings):
             "funasr_streaming_model": self.funasr_streaming_model,
             "funasr_streaming_chunk_size": list(self.parsed_funasr_streaming_chunk_size),
             "pyannote_model": self.pyannote_model,
+            "voiceprint_model": self.voiceprint_model,
+            "voiceprint_match_threshold": self.voiceprint_match_threshold,
             "sentiment_transformer_model": self.sentiment_transformer_model,
             "embedding_model": self.embedding_model,
             "retrieval_chunk_size": self.retrieval_chunk_size,
@@ -152,6 +171,7 @@ class MeetingAISettings(BaseSettings):
             "retrieval_reranker_model": self.retrieval_reranker_model,
             "sentiment_timeline_window_seconds": self.sentiment_timeline_window_seconds,
             "chroma_persist_dir": str(self.chroma_persist_dir),
+            "voiceprint_dir": str(self.voiceprint_dir),
         }
 
 

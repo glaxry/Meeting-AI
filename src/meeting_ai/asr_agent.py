@@ -15,6 +15,7 @@ from pyannote.audio import Pipeline
 
 from .config import MeetingAISettings, get_settings
 from .schemas import DiarizationSegment, TranscriptResult, TranscriptSegment
+from .voiceprint import VoiceprintIdentifier, apply_voiceprint_identities
 
 
 LOGGER = logging.getLogger(__name__)
@@ -323,10 +324,12 @@ class MeetingASRAgent:
         settings: MeetingAISettings | None = None,
         transcriber: FunASRTranscriber | None = None,
         diarizer: PyannoteDiarizer | None = None,
+        voiceprint_identifier: VoiceprintIdentifier | None = None,
     ):
         self.settings = settings or get_settings()
         self.transcriber = transcriber or FunASRTranscriber(self.settings)
         self.diarizer = diarizer or PyannoteDiarizer(self.settings)
+        self.voiceprint_identifier = voiceprint_identifier or VoiceprintIdentifier(self.settings)
 
     def transcribe(
         self,
@@ -336,6 +339,7 @@ class MeetingASRAgent:
         num_speakers: int | None = None,
         min_speakers: int | None = None,
         max_speakers: int | None = None,
+        enable_voiceprint: bool = False,
     ) -> TranscriptResult:
         path = Path(audio_path).expanduser().resolve()
         if not path.exists():
@@ -348,6 +352,13 @@ class MeetingASRAgent:
         diarization_backend = "disabled"
         diarization_segments: list[DiarizationSegment] = []
         diarization_metadata: dict[str, Any] = {}
+        voiceprint_matches: dict[str, dict[str, Any]] = {}
+        voiceprint_summary: dict[str, Any] = {
+            "enabled": bool(enable_voiceprint),
+            "matched_speakers": 0,
+            "unknown_speakers": 0,
+            "profile_count": 0,
+        }
 
         if use_diarization:
             if self.diarizer.enabled:
@@ -370,6 +381,36 @@ class MeetingASRAgent:
             else:
                 warnings.append("HUGGINGFACE_TOKEN is missing; speaker diarization skipped.")
                 diarization_backend = "single-speaker-fallback"
+        elif enable_voiceprint:
+            warnings.append("Voiceprint matching requires diarization; enable_diarization is false.")
+
+        if enable_voiceprint and diarization_segments:
+            try:
+                voiceprint_matches = self.voiceprint_identifier.identify(
+                    audio_path=path,
+                    diarization_segments=diarization_segments,
+                )
+                if voiceprint_matches:
+                    transcript_segments = apply_voiceprint_identities(transcript_segments, voiceprint_matches)
+                    voiceprint_summary["matched_speakers"] = sum(
+                        1 for payload in voiceprint_matches.values() if payload.get("status") == "matched"
+                    )
+                    voiceprint_summary["unknown_speakers"] = sum(
+                        1 for payload in voiceprint_matches.values() if payload.get("status") != "matched"
+                    )
+                    voiceprint_summary["profile_count"] = max(
+                        (int(payload.get("profile_count", 0)) for payload in voiceprint_matches.values()),
+                        default=0,
+                    )
+                else:
+                    profile_count = self.voiceprint_identifier.registry.get_profile_count()
+                    voiceprint_summary["profile_count"] = profile_count
+                    if profile_count == 0:
+                        warnings.append("Voiceprint matching enabled, but no enrolled profiles were found.")
+                    else:
+                        warnings.append("Voiceprint matching skipped because no diarized speaker had enough audio.")
+            except Exception as exc:  # pragma: no cover
+                warnings.append(f"voiceprint matching failed: {exc}")
 
         full_text = "\n".join(f"[{segment.speaker}] {segment.text}" for segment in transcript_segments)
         low_confidence_assignments = sum(
@@ -386,6 +427,10 @@ class MeetingASRAgent:
             "speaker_confidence_high_count": sum(
                 1 for segment in transcript_segments if segment.metadata.get("speaker_confidence") == "high"
             ),
+            "voiceprint": {
+                **voiceprint_summary,
+                "matches": voiceprint_matches,
+            },
         }
 
         return TranscriptResult(
@@ -408,6 +453,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-speakers", type=int, help="Known number of speakers.")
     parser.add_argument("--min-speakers", type=int, help="Lower bound for the speaker count.")
     parser.add_argument("--max-speakers", type=int, help="Upper bound for the speaker count.")
+    parser.add_argument("--enable-voiceprint", action="store_true", help="Match diarized speakers against enrolled voiceprints.")
     return parser
 
 
@@ -424,6 +470,7 @@ def main() -> None:
         num_speakers=args.num_speakers,
         min_speakers=args.min_speakers,
         max_speakers=args.max_speakers,
+        enable_voiceprint=args.enable_voiceprint,
     )
 
     payload = result.model_dump_json(indent=2)

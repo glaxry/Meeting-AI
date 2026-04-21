@@ -37,6 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--history-query", help="Optional retrieval query.")
     parser.add_argument("--num-speakers", type=int)
     parser.add_argument("--disable-diarization", action="store_true")
+    parser.add_argument("--enable-voiceprint", action="store_true")
     parser.add_argument("--output", help="Optional output JSON path.")
     return parser
 
@@ -55,6 +56,7 @@ def main() -> None:
         history_query=args.history_query,
         use_diarization=not args.disable_diarization,
         num_speakers=args.num_speakers,
+        enable_voiceprint=args.enable_voiceprint,
     )
     payload = result.model_dump_json(indent=2)
     if args.output:

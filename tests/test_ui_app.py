@@ -109,11 +109,13 @@ def test_analyze_via_api_posts_multipart_request(monkeypatch) -> None:
         glossary={"语音识别": "speech-recognition"},
         use_diarization=True,
         num_speakers=None,
+        enable_voiceprint=True,
     )
 
     assert captured["url"].endswith("/meetings/analyze")
     assert json.loads(captured["data"]["selected_agents"]) == []
     assert json.loads(captured["data"]["glossary"]) == {"语音识别": "speech-recognition"}
+    assert captured["data"]["enable_voiceprint"] == "true"
     assert captured["file_name"] == "asr_example_zh.wav"
     assert captured["file_open"] is True
     assert captured["timeout"] is None
@@ -195,7 +197,11 @@ def test_format_transcript_shows_week2_annotations() -> None:
                     end=1.0,
                     emotion="neutral",
                     event="speech",
-                    metadata={"speaker_confidence": "high"},
+                    metadata={
+                        "speaker_confidence": "high",
+                        "speaker_identity_name": "Alice",
+                        "speaker_identity_score": 0.93,
+                    },
                 )
             ],
             full_text="[SPEAKER_00] 欢迎大家",
@@ -208,6 +214,7 @@ def test_format_transcript_shows_week2_annotations() -> None:
     assert "emotion=neutral" in text
     assert "event=speech" in text
     assert "speaker_confidence=high" in text
+    assert "identity=Alice (0.930)" in text
 
 
 def test_format_sentiment_includes_timeline_snapshot_lines() -> None:

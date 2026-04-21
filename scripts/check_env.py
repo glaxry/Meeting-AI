@@ -37,6 +37,7 @@ def main() -> None:
         "imports": {
             "funasr": import_status("funasr"),
             "pyannote.audio": import_status("pyannote.audio"),
+            "speechbrain": import_status("speechbrain"),
             "openai": import_status("openai"),
             "transformers": import_status("transformers"),
             "gradio": import_status("gradio"),
