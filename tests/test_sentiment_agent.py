@@ -83,6 +83,8 @@ def test_sentiment_agent_llm_route_returns_structured_output() -> None:
     assert result.overall_tone == SentimentLabel.DISAGREEMENT
     assert result.segments[1].sentiment == SentimentLabel.HESITATION
     assert result.segments[2].speaker == "C"
+    assert len(result.timeline) == 1
+    assert result.timeline[0].dominant_label == SentimentLabel.AGREEMENT
 
 
 def test_sentiment_agent_transformer_route_normalizes_to_five_labels() -> None:
@@ -102,6 +104,7 @@ def test_sentiment_agent_transformer_route_normalizes_to_five_labels() -> None:
     assert result.segments[1].sentiment == SentimentLabel.HESITATION
     assert result.segments[2].sentiment == SentimentLabel.TENSION
     assert result.overall_tone == SentimentLabel.TENSION
+    assert len(result.timeline) == 1
 
 
 def test_sentiment_agent_llm_route_tolerates_missing_overall_tone() -> None:
@@ -126,3 +129,21 @@ def test_sentiment_agent_llm_route_tolerates_missing_overall_tone() -> None:
 
     assert result.overall_tone == SentimentLabel.TENSION
     assert len(result.segments) == 3
+
+
+def test_sentiment_agent_analyze_timeline_splits_windows() -> None:
+    classifier = TransformersSentimentClassifier(
+        settings=MeetingAISettings(sentiment_transformer_model="fake-model", sentiment_timeline_window_seconds=1.0),
+        classifier_pipeline=FakePipeline(),
+    )
+    agent = SentimentAgent(
+        settings=MeetingAISettings(sentiment_transformer_model="fake-model", sentiment_timeline_window_seconds=1.0),
+        transformer_classifier=classifier,
+    )
+
+    timeline = agent.analyze_timeline(route="transformer", transcript=build_segments(), window_seconds=1.0)
+
+    assert len(timeline) == 3
+    assert timeline[0].dominant_label == SentimentLabel.AGREEMENT
+    assert timeline[1].dominant_label == SentimentLabel.HESITATION
+    assert timeline[2].dominant_label == SentimentLabel.TENSION

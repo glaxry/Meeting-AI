@@ -59,7 +59,16 @@ def format_transcript(result: MeetingWorkflowResult) -> str:
 
     lines = []
     for segment in result.transcript.segments:
-        lines.append(f"{segment.start:>7.2f}s - {segment.end:>7.2f}s | {segment.speaker} | {segment.text}")
+        annotations: list[str] = []
+        if segment.emotion:
+            annotations.append(f"emotion={segment.emotion}")
+        if segment.event:
+            annotations.append(f"event={segment.event}")
+        speaker_confidence = segment.metadata.get("speaker_confidence")
+        if speaker_confidence:
+            annotations.append(f"speaker_confidence={speaker_confidence}")
+        suffix = f" | {' | '.join(annotations)}" if annotations else ""
+        lines.append(f"{segment.start:>7.2f}s - {segment.end:>7.2f}s | {segment.speaker} | {segment.text}{suffix}")
     return "\n".join(lines) or result.transcript.full_text or "No transcript text."
 
 
@@ -126,6 +135,19 @@ def format_sentiment(result: SentimentResult | None, selected_agents: list[str] 
         lines.append(
             f"{timing}{speaker} | {segment.sentiment.value} ({segment.confidence:.2f}) | {segment.text}"
         )
+    if result.timeline:
+        lines.append("")
+        lines.append("Timeline snapshots:")
+        for snapshot in result.timeline:
+            distribution = ", ".join(
+                f"{label}={value:.3f}"
+                for label, value in snapshot.label_distribution.items()
+            )
+            speakers = ", ".join(snapshot.speakers_involved) or "UNKNOWN"
+            lines.append(
+                f"{snapshot.window_start:>7.2f}s - {snapshot.window_end:>7.2f}s | "
+                f"{snapshot.dominant_label.value} | speakers={speakers} | {distribution}"
+            )
     return "\n".join(lines)
 
 
@@ -180,6 +202,7 @@ def format_diagnostics(result: MeetingWorkflowResult) -> str:
                 f"- ASR runtime: {result.transcript.metadata.get('asr_runtime_seconds', 'n/a')}s",
                 f"- diarization runtime: {result.transcript.metadata.get('diarization_runtime_seconds', 'n/a')}s",
                 f"- diarization backend: {result.transcript.diarization_backend}",
+                f"- low-confidence speaker assignments: {result.transcript.metadata.get('speaker_confidence_low_count', 0)}",
             ]
         )
     return "\n".join(lines)

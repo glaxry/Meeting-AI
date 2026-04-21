@@ -12,6 +12,7 @@ from meeting_ai.schemas import (
     SentimentResult,
     SentimentSegment,
     SummaryResult,
+    TranscriptResult,
     TranscriptSegment,
     TranslationResult,
 )
@@ -22,6 +23,7 @@ from ui.app import (
     format_history,
     format_sentiment,
     format_summary,
+    format_transcript,
     format_translation,
     parse_glossary,
 )
@@ -157,6 +159,7 @@ def test_format_sentiment_returns_readable_lines() -> None:
                 end=1.0,
             )
         ],
+        timeline=[],
     )
 
     text = format_sentiment(result, selected_agents=["sentiment"])
@@ -164,6 +167,67 @@ def test_format_sentiment_returns_readable_lines() -> None:
     assert "Overall tone: agreement" in text
     assert "agreement (0.90)" in text
     assert "{" not in text
+
+
+def test_format_transcript_shows_week2_annotations() -> None:
+    result = MeetingWorkflowResult(
+        transcript=TranscriptResult(
+            audio_path="demo.wav",
+            language="zh",
+            asr_model="iic/SenseVoiceSmall",
+            diarization_backend="mock",
+            segments=[
+                TranscriptSegment(
+                    speaker="SPEAKER_00",
+                    text="欢迎大家",
+                    start=0.0,
+                    end=1.0,
+                    emotion="neutral",
+                    event="speech",
+                    metadata={"speaker_confidence": "high"},
+                )
+            ],
+            full_text="[SPEAKER_00] 欢迎大家",
+            metadata={},
+        )
+    )
+
+    text = format_transcript(result)
+
+    assert "emotion=neutral" in text
+    assert "event=speech" in text
+    assert "speaker_confidence=high" in text
+
+
+def test_format_sentiment_includes_timeline_snapshot_lines() -> None:
+    result = SentimentResult(
+        route="transformer",
+        overall_tone=SentimentLabel.TENSION,
+        segments=[
+            SentimentSegment(
+                text="This delay is a serious risk.",
+                sentiment=SentimentLabel.TENSION,
+                confidence=0.88,
+                speaker="SPEAKER_01",
+                start=2.0,
+                end=3.0,
+            )
+        ],
+        timeline=[
+            {
+                "window_start": 0.0,
+                "window_end": 120.0,
+                "dominant_label": "tension",
+                "label_distribution": {"tension": 1.0},
+                "speakers_involved": ["SPEAKER_01"],
+            }
+        ],
+    )
+
+    text = format_sentiment(result, selected_agents=["sentiment"])
+
+    assert "Timeline snapshots:" in text
+    assert "speakers=SPEAKER_01" in text
 
 
 def test_format_action_items_respects_unselected_agent() -> None:

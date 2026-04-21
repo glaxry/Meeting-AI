@@ -19,6 +19,26 @@ from .schemas import DiarizationSegment, TranscriptResult, TranscriptSegment
 
 LOGGER = logging.getLogger(__name__)
 _CONTROL_TOKEN_PATTERN = re.compile(r"<\|[^|]+?\|>")
+_SENSEVOICE_EMOTION_TOKENS = {
+    "neutral",
+    "happy",
+    "sad",
+    "angry",
+    "fearful",
+    "surprised",
+    "disgusted",
+}
+_SENSEVOICE_EVENT_TOKENS = {
+    "speech",
+    "laughter",
+    "applause",
+    "crying",
+    "cough",
+    "sneeze",
+    "music",
+    "noise",
+}
+MIN_OVERLAP_RATIO = 0.1
 
 
 def _setup_logging() -> None:
@@ -91,12 +111,39 @@ def _clean_transcript_text(text: str) -> str:
     return normalized.strip()
 
 
+def _control_tokens(text: str) -> list[str]:
+    return [match[2:-2].strip().lower() for match in _CONTROL_TOKEN_PATTERN.findall(text or "")]
+
+
+def _normalize_optional_tag(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    normalized = value.strip().lower()
+    return normalized or None
+
+
+def _extract_sensevoice_annotations(item: dict[str, Any]) -> tuple[str | None, str | None]:
+    emotion = _normalize_optional_tag(item.get("emotion")) or _normalize_optional_tag(item.get("emo"))
+    event = _normalize_optional_tag(item.get("event")) or _normalize_optional_tag(item.get("audio_event"))
+
+    token_candidates: list[str] = []
+    token_candidates.extend(_control_tokens(str(item.get("raw_text", ""))))
+    token_candidates.extend(_control_tokens(str(item.get("text", ""))))
+
+    if emotion is None:
+        emotion = next((token for token in token_candidates if token in _SENSEVOICE_EMOTION_TOKENS), None)
+    if event is None:
+        event = next((token for token in token_candidates if token in _SENSEVOICE_EVENT_TOKENS), None)
+    return emotion, event
+
+
 def normalize_sentence_info(sentence_info: list[dict[str, Any]], audio_duration: float | None) -> list[TranscriptSegment]:
     segments: list[TranscriptSegment] = []
     for item in sentence_info:
         text = _clean_transcript_text(str(item.get("text", "")))
         if not text:
             continue
+        emotion, event = _extract_sensevoice_annotations(item)
         segments.append(
             TranscriptSegment(
                 speaker="SPEAKER_00",
@@ -104,6 +151,8 @@ def normalize_sentence_info(sentence_info: list[dict[str, Any]], audio_duration:
                 start=_coerce_seconds(item.get("start", 0.0), audio_duration),
                 end=_coerce_seconds(item.get("end", 0.0), audio_duration),
                 raw_text=_clean_transcript_text(str(item.get("raw_text", "")).strip()) or None,
+                emotion=emotion,
+                event=event,
             )
         )
     return sorted(segments, key=lambda seg: (seg.start, seg.end))
@@ -116,29 +165,48 @@ def _overlap(a_start: float, a_end: float, b_start: float, b_end: float) -> floa
 def assign_speakers(
     transcript_segments: list[TranscriptSegment],
     diarization_segments: list[DiarizationSegment],
+    min_overlap_ratio: float = MIN_OVERLAP_RATIO,
 ) -> list[TranscriptSegment]:
     if not diarization_segments:
         return transcript_segments
 
     assigned: list[TranscriptSegment] = []
     for segment in transcript_segments:
+        duration = max(segment.end - segment.start, 1e-6)
         best_speaker = diarization_segments[0].speaker
-        best_overlap = -1.0
+        best_overlap = 0.0
         for diarized in diarization_segments:
             overlap = _overlap(segment.start, segment.end, diarized.start, diarized.end)
             if overlap > best_overlap:
                 best_overlap = overlap
                 best_speaker = diarized.speaker
 
-        if best_overlap <= 0:
+        best_ratio = round(best_overlap / duration, 3)
+        metadata = dict(segment.metadata)
+        if best_ratio < min_overlap_ratio:
             center = (segment.start + segment.end) / 2
             nearest = min(
                 diarization_segments,
                 key=lambda item: abs(((item.start + item.end) / 2) - center),
             )
             best_speaker = nearest.speaker
+            metadata.update(
+                {
+                    "speaker_confidence": "low",
+                    "overlap_ratio": best_ratio,
+                    "assignment_strategy": "nearest_segment",
+                }
+            )
+        else:
+            metadata.update(
+                {
+                    "speaker_confidence": "high",
+                    "overlap_ratio": best_ratio,
+                    "assignment_strategy": "overlap_match",
+                }
+            )
 
-        assigned.append(segment.model_copy(update={"speaker": best_speaker}))
+        assigned.append(segment.model_copy(update={"speaker": best_speaker, "metadata": metadata}))
 
     return assigned
 
@@ -172,6 +240,7 @@ class FunASRTranscriber:
         segments = normalize_sentence_info(sentence_info, audio_duration)
 
         if not segments and payload.get("text"):
+            emotion, event = _extract_sensevoice_annotations(payload)
             segments = [
                 TranscriptSegment(
                     speaker="SPEAKER_00",
@@ -179,6 +248,8 @@ class FunASRTranscriber:
                     start=0.0,
                     end=round(audio_duration, 3),
                     raw_text=_clean_transcript_text(str(payload.get("raw_text", "")).strip()) or None,
+                    emotion=emotion,
+                    event=event,
                 )
             ]
 
@@ -186,6 +257,9 @@ class FunASRTranscriber:
             "asr_runtime_seconds": elapsed,
             "sentence_count": len(segments),
             "raw_result_keys": sorted(payload.keys()),
+            "sensevoice_enrichment": _uses_sensevoice_model(self.settings.funasr_model),
+            "emotion_segment_count": sum(1 for segment in segments if segment.emotion),
+            "event_segment_count": sum(1 for segment in segments if segment.event),
         }
         return segments, metadata
 
@@ -298,6 +372,9 @@ class MeetingASRAgent:
                 diarization_backend = "single-speaker-fallback"
 
         full_text = "\n".join(f"[{segment.speaker}] {segment.text}" for segment in transcript_segments)
+        low_confidence_assignments = sum(
+            1 for segment in transcript_segments if segment.metadata.get("speaker_confidence") == "low"
+        )
         metadata: dict[str, Any] = {
             **asr_metadata,
             **diarization_metadata,
@@ -305,6 +382,10 @@ class MeetingASRAgent:
             "audio_duration_seconds": round(audio_duration, 3),
             "warnings": warnings,
             "diarization_segments": [segment.model_dump() for segment in diarization_segments],
+            "speaker_confidence_low_count": low_confidence_assignments,
+            "speaker_confidence_high_count": sum(
+                1 for segment in transcript_segments if segment.metadata.get("speaker_confidence") == "high"
+            ),
         }
 
         return TranscriptResult(

@@ -51,7 +51,7 @@ class MeetingAISettings(BaseSettings):
     )
     embedding_model: str = Field(default="intfloat/multilingual-e5-small", alias="EMBEDDING_MODEL")
 
-    funasr_model: str = Field(default="paraformer-zh", alias="FUNASR_MODEL")
+    funasr_model: str = Field(default="iic/SenseVoiceSmall", alias="FUNASR_MODEL")
     funasr_vad_model: str = Field(default="fsmn-vad", alias="FUNASR_VAD_MODEL")
     funasr_punc_model: str = Field(default="ct-punc-c", alias="FUNASR_PUNC_MODEL")
     funasr_hub: str = Field(default="ms", alias="FUNASR_HUB")
@@ -64,6 +64,7 @@ class MeetingAISettings(BaseSettings):
     summary_map_reduce_threshold: int = Field(default=500, alias="SUMMARY_MAP_REDUCE_THRESHOLD")
     summary_chunk_target_words: int = Field(default=350, alias="SUMMARY_CHUNK_TARGET_WORDS")
     retrieval_chunk_size: int = Field(default=20, alias="RETRIEVAL_CHUNK_SIZE")
+    sentiment_timeline_window_seconds: float = Field(default=120.0, alias="SENTIMENT_TIMELINE_WINDOW_SECONDS")
 
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
     default_output_dir: Path = Field(default=PROJECT_ROOT / "data" / "outputs")
@@ -113,6 +114,7 @@ class MeetingAISettings(BaseSettings):
             "sentiment_transformer_model": self.sentiment_transformer_model,
             "embedding_model": self.embedding_model,
             "retrieval_chunk_size": self.retrieval_chunk_size,
+            "sentiment_timeline_window_seconds": self.sentiment_timeline_window_seconds,
             "chroma_persist_dir": str(self.chroma_persist_dir),
         }
 

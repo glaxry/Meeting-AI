@@ -11,7 +11,15 @@ from pydantic import BaseModel, Field
 
 from .config import MeetingAISettings, get_settings
 from .llm_tools import UnifiedLLMClient
-from .schemas import LLMProvider, SentimentLabel, SentimentResult, SentimentSegment, TranscriptResult, TranscriptSegment
+from .schemas import (
+    LLMProvider,
+    SentimentLabel,
+    SentimentResult,
+    SentimentSegment,
+    SentimentSnapshot,
+    TranscriptResult,
+    TranscriptSegment,
+)
 from .text_utils import extract_json_payload, load_text_input, load_transcript_json, parse_labelled_lines, transcript_to_segments
 
 
@@ -156,6 +164,34 @@ def _coerce_sentiment_label(value: Any) -> SentimentLabel:
         return SentimentLabel(str(value).strip().lower())
     except Exception:
         return SentimentLabel.NEUTRAL
+
+
+def _timeline_bounds(segments: list[SentimentSegment]) -> tuple[float, float]:
+    if not segments:
+        return 0.0, 0.0
+
+    starts = [segment.start for segment in segments if segment.start is not None]
+    ends = [
+        segment.end if segment.end is not None else segment.start
+        for segment in segments
+        if segment.start is not None or segment.end is not None
+    ]
+    if not starts:
+        return 0.0, max(float(len(segments)), 1.0)
+
+    timeline_start = min(float(start) for start in starts)
+    timeline_end = max(float(end or timeline_start) for end in ends)
+    if timeline_end <= timeline_start:
+        timeline_end = timeline_start + 1.0
+    return round(timeline_start, 3), round(timeline_end, 3)
+
+
+def _segment_overlaps_window(segment: SentimentSegment, window_start: float, window_end: float) -> bool:
+    segment_start = segment.start if segment.start is not None else window_start
+    segment_end = segment.end if segment.end is not None else segment_start
+    if segment_end <= segment_start:
+        segment_end = segment_start + 1e-6
+    return segment_start < window_end and segment_end > window_start
 
 
 def _normalize_llm_payload(payload: Any, segment_count: int) -> _LLMSentimentPayload:
@@ -315,6 +351,75 @@ class SentimentAgent:
             return self._analyze_with_transformer(segments)
         raise ValueError(f"Unsupported sentiment route: {route}")
 
+    def analyze_timeline(
+        self,
+        route: str,
+        transcript: TranscriptResult | list[TranscriptSegment] | None = None,
+        text: str | None = None,
+        window_seconds: float | None = None,
+    ) -> list[SentimentSnapshot]:
+        result = self.analyze(route=route, transcript=transcript, text=text)
+        return self.build_timeline(
+            result.segments,
+            window_seconds=window_seconds or self.settings.sentiment_timeline_window_seconds,
+        )
+
+    def build_timeline(
+        self,
+        segments: list[SentimentSegment],
+        window_seconds: float | None = None,
+    ) -> list[SentimentSnapshot]:
+        if not segments:
+            return []
+
+        resolved_window = float(window_seconds or self.settings.sentiment_timeline_window_seconds)
+        if resolved_window <= 0:
+            raise ValueError("window_seconds must be greater than 0.")
+
+        timeline_start, timeline_end = _timeline_bounds(segments)
+        snapshots: list[SentimentSnapshot] = []
+        cursor = timeline_start
+
+        while cursor < timeline_end:
+            window_end = min(cursor + resolved_window, timeline_end)
+            window_items = [
+                segment
+                for segment in segments
+                if _segment_overlaps_window(segment, cursor, window_end)
+            ]
+            if window_items:
+                weights: dict[str, float] = {}
+                for segment in window_items:
+                    weights[segment.sentiment.value] = weights.get(segment.sentiment.value, 0.0) + max(segment.confidence, 0.01)
+                total_weight = sum(weights.values()) or 1.0
+                dominant_label = SentimentLabel(max(weights, key=weights.get))
+                snapshots.append(
+                    SentimentSnapshot(
+                        window_start=round(cursor, 3),
+                        window_end=round(window_end, 3),
+                        dominant_label=dominant_label,
+                        label_distribution={key: round(value / total_weight, 3) for key, value in sorted(weights.items())},
+                        speakers_involved=sorted({segment.speaker or "UNKNOWN" for segment in window_items}),
+                    )
+                )
+            cursor += resolved_window
+
+        if not snapshots:
+            total_weight = sum(max(segment.confidence, 0.01) for segment in segments) or 1.0
+            weights: dict[str, float] = {}
+            for segment in segments:
+                weights[segment.sentiment.value] = weights.get(segment.sentiment.value, 0.0) + max(segment.confidence, 0.01)
+            snapshots.append(
+                SentimentSnapshot(
+                    window_start=0.0,
+                    window_end=round(resolved_window, 3),
+                    dominant_label=SentimentLabel(max(weights, key=weights.get)),
+                    label_distribution={key: round(value / total_weight, 3) for key, value in sorted(weights.items())},
+                    speakers_involved=sorted({segment.speaker or "UNKNOWN" for segment in segments}),
+                )
+            )
+        return snapshots
+
     def _analyze_with_llm(self, segments: list[TranscriptSegment]) -> SentimentResult:
         prompt_lines = [
             f"{index}\t[{segment.speaker}] {segment.text}"
@@ -355,24 +460,36 @@ class SentimentAgent:
                 )
             )
 
+        timeline = self.build_timeline(result_segments)
+
         return SentimentResult(
             route="llm",
             overall_tone=payload.overall_tone,
             segments=result_segments,
+            timeline=timeline,
             metadata={
                 "provider": self.provider.value,
                 "latency_seconds": response.latency_seconds,
                 "segment_count": len(result_segments),
+                "timeline_window_seconds": self.settings.sentiment_timeline_window_seconds,
+                "timeline_snapshot_count": len(timeline),
             },
         )
 
     def _analyze_with_transformer(self, segments: list[TranscriptSegment]) -> SentimentResult:
         result_segments, metadata = self.transformer_classifier.classify_segments(segments)
+        timeline = self.build_timeline(result_segments)
         return SentimentResult(
             route="transformer",
             overall_tone=_resolve_overall_tone(result_segments),
             segments=result_segments,
-            metadata={"segment_count": len(result_segments), **metadata},
+            timeline=timeline,
+            metadata={
+                "segment_count": len(result_segments),
+                "timeline_window_seconds": self.settings.sentiment_timeline_window_seconds,
+                "timeline_snapshot_count": len(timeline),
+                **metadata,
+            },
         )
 
 

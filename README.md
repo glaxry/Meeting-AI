@@ -11,6 +11,8 @@
 
 The project targets Windows + CUDA + Conda. Local GPU is used for ASR, diarization, transformer sentiment, and embeddings. DeepSeek or Qwen is used for LLM tasks.
 
+The repo should prefer the `meeting-ai-w1` conda environment for local development and validation. A separate `.venv` is not required for normal use.
+
 ## Current Components
 
 - `asr_agent.py`: audio -> transcript JSON with speaker labels
@@ -64,7 +66,9 @@ Useful defaults already included:
 
 - `SENTIMENT_TRANSFORMER_MODEL=lxyuan/distilbert-base-multilingual-cased-sentiments-student`
 - `EMBEDDING_MODEL=intfloat/multilingual-e5-small`
+- `FUNASR_MODEL=iic/SenseVoiceSmall`
 - `RETRIEVAL_CHUNK_SIZE=20`
+- `SENTIMENT_TIMELINE_WINDOW_SECONDS=120`
 - `CHROMA_PERSIST_DIR=data/chroma`
 
 DeepSeek key lookup order:
@@ -139,6 +143,8 @@ python llm_tools.py --provider deepseek --prompt "请只回复 OK"
 python scripts/week1_demo.py --audio .\data\samples\asr_example_zh.wav --provider deepseek --num-speakers 2
 ```
 
+Detailed Week 1 delivery notes are in `reports\week1_documentation.md`.
+
 ## Week 2 Quick Test
 
 ```powershell
@@ -147,6 +153,8 @@ python translation_agent.py --provider deepseek --source-language zh --target-la
 python action_item_agent.py --provider deepseek --transcript-json .\data\outputs\transcript.json --output .\data\outputs\action_items.json
 python sentiment_agent.py --route transformer --transcript-json .\data\outputs\transcript.json --output .\data\outputs\sentiment_transformer.json
 ```
+
+Detailed Week 2 delivery notes are in `reports\week2_documentation.md`.
 
 ## Week 3 Quick Test
 
@@ -320,6 +328,8 @@ If a live API path is slow, the repo already contains fallback evidence:
 |       `-- schemas.py
 |-- reports
 |   |-- final_project_report.md
+|   |-- week1_documentation.md
+|   |-- week2_documentation.md
 |   |-- week4_experiments.md
 |   |-- week3_5_progress_report.md
 |   `-- assets
@@ -352,5 +362,6 @@ If a live API path is slow, the repo already contains fallback evidence:
 
 - `pyannote.audio` is still sensitive to dependency combinations on Windows
 - LLM sentiment on long transcripts is tolerant but still coarse
-- Retrieval is based on stored meeting summaries, not raw full-meeting chunk search
+- Sentiment timeline is currently surfaced as structured snapshots, not yet a dedicated chart in the UI
+- Retrieval now supports transcript chunks, but long-history evaluation is still limited
 - `data/samples/test.wav` is treated as a local validation asset and is not committed

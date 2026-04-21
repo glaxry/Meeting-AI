@@ -43,6 +43,8 @@ def test_assign_speakers_prefers_overlap() -> None:
 
     assert assigned[0].speaker == "SPEAKER_A"
     assert assigned[1].speaker == "SPEAKER_B"
+    assert assigned[0].metadata["speaker_confidence"] == "high"
+    assert assigned[1].metadata["speaker_confidence"] == "high"
 
 
 def test_sensevoice_helpers_switch_remote_code_and_language() -> None:
@@ -70,3 +72,36 @@ def test_normalize_sentence_info_strips_sensevoice_control_tokens() -> None:
     )
 
     assert segments[0].text == "欢迎大家"
+    assert segments[0].emotion == "neutral"
+    assert segments[0].event == "speech"
+
+
+def test_assign_speakers_marks_low_confidence_when_overlap_is_too_small() -> None:
+    transcript_segments = normalize_sentence_info(
+        [
+            {"text": "这句比较短", "start": 1000, "end": 1200},
+        ],
+        audio_duration=2.0,
+    )
+    diarization_segments = [
+        DiarizationSegment(speaker="SPEAKER_A", start=0.0, end=0.9),
+        DiarizationSegment(speaker="SPEAKER_B", start=1.3, end=2.0),
+    ]
+
+    assigned = assign_speakers(transcript_segments, diarization_segments, min_overlap_ratio=0.2)
+
+    assert assigned[0].speaker == "SPEAKER_B"
+    assert assigned[0].metadata["speaker_confidence"] == "low"
+    assert assigned[0].metadata["assignment_strategy"] == "nearest_segment"
+
+
+def test_normalize_sentence_info_reads_explicit_emotion_and_event_fields() -> None:
+    segments = normalize_sentence_info(
+        [
+            {"text": "太好了", "start": 0, "end": 1000, "emotion": "happy", "event": "applause"},
+        ],
+        audio_duration=1.0,
+    )
+
+    assert segments[0].emotion == "happy"
+    assert segments[0].event == "applause"

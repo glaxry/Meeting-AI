@@ -28,6 +28,9 @@ class TranscriptSegment(BaseModel):
     start: float
     end: float
     raw_text: str | None = None
+    emotion: str | None = None
+    event: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class TranscriptResult(BaseModel):
@@ -102,10 +105,19 @@ class SentimentSegment(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class SentimentSnapshot(BaseModel):
+    window_start: float
+    window_end: float
+    dominant_label: SentimentLabel
+    label_distribution: dict[str, float] = Field(default_factory=dict)
+    speakers_involved: list[str] = Field(default_factory=list)
+
+
 class SentimentResult(BaseModel):
     route: str
     overall_tone: SentimentLabel
     segments: list[SentimentSegment] = Field(default_factory=list)
+    timeline: list[SentimentSnapshot] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
