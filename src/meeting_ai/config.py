@@ -76,6 +76,13 @@ class MeetingAISettings(BaseSettings):
     summary_map_reduce_threshold: int = Field(default=500, alias="SUMMARY_MAP_REDUCE_THRESHOLD")
     summary_chunk_target_words: int = Field(default=350, alias="SUMMARY_CHUNK_TARGET_WORDS")
     retrieval_chunk_size: int = Field(default=20, alias="RETRIEVAL_CHUNK_SIZE")
+    retrieval_strategy: str = Field(default="hybrid", alias="RETRIEVAL_STRATEGY")
+    retrieval_dense_candidate_k: int = Field(default=12, alias="RETRIEVAL_DENSE_CANDIDATE_K")
+    retrieval_sparse_candidate_k: int = Field(default=12, alias="RETRIEVAL_SPARSE_CANDIDATE_K")
+    retrieval_rrf_k: int = Field(default=60, alias="RETRIEVAL_RRF_K")
+    retrieval_enable_reranker: bool = Field(default=True, alias="RETRIEVAL_ENABLE_RERANKER")
+    retrieval_reranker_model: str = Field(default="BAAI/bge-reranker-base", alias="RETRIEVAL_RERANKER_MODEL")
+    retrieval_reranker_candidate_k: int = Field(default=8, alias="RETRIEVAL_RERANKER_CANDIDATE_K")
     sentiment_timeline_window_seconds: float = Field(default=120.0, alias="SENTIMENT_TIMELINE_WINDOW_SECONDS")
 
     deepseek_key_file: Path = Field(default=PROJECT_ROOT / "api-key-deepseek")
@@ -138,6 +145,11 @@ class MeetingAISettings(BaseSettings):
             "sentiment_transformer_model": self.sentiment_transformer_model,
             "embedding_model": self.embedding_model,
             "retrieval_chunk_size": self.retrieval_chunk_size,
+            "retrieval_strategy": self.retrieval_strategy,
+            "retrieval_dense_candidate_k": self.retrieval_dense_candidate_k,
+            "retrieval_sparse_candidate_k": self.retrieval_sparse_candidate_k,
+            "retrieval_enable_reranker": self.retrieval_enable_reranker,
+            "retrieval_reranker_model": self.retrieval_reranker_model,
             "sentiment_timeline_window_seconds": self.sentiment_timeline_window_seconds,
             "chroma_persist_dir": str(self.chroma_persist_dir),
         }

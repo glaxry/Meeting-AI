@@ -5,6 +5,7 @@
 - Week 1: ASR, speaker diarization, unified LLM access
 - Week 2: summary, translation, action-item extraction, sentiment analysis
 - Week 3: LangGraph orchestration, Chroma retrieval, FastAPI backend, Gradio UI
+- Retrieval Upgrade: hybrid dense + BM25 retrieval with CrossEncoder reranking
 - Streaming MVP: FunASR streaming ASR, FastAPI WebSocket transport, Gradio microphone demo
 - Week 3.5: report generation from real workflow artifacts
 - Week 4: experiment scripts for ASR, summary, architecture, and sentiment evaluation
@@ -22,7 +23,7 @@ The repo should prefer the `meeting-ai-w1` conda environment for local developme
 - `action_item_agent.py`: explicit and implicit task extraction
 - `sentiment_agent.py`: `llm` and `transformer` routes with unified schema
 - `orchestrator.py`: Week 3 LangGraph workflow
-- `src/meeting_ai/retrieval.py`: Chroma + sentence-transformers retrieval
+- `src/meeting_ai/retrieval.py`: Chroma + dense/BM25 hybrid retrieval with CrossEncoder reranking
 - `src/meeting_ai/reporting.py`: Week 3.5 report and SVG asset generation
 - `src/meeting_ai/evaluation.py`: shared evaluation metrics for Week 4
 - `src/meeting_ai/baseline.py`: serial pipeline baseline for Week 4 architecture comparisons
@@ -69,6 +70,8 @@ Useful defaults already included:
 - `SENTIMENT_TRANSFORMER_MODEL=lxyuan/distilbert-base-multilingual-cased-sentiments-student`
 - `EMBEDDING_MODEL=intfloat/multilingual-e5-small`
 - `FUNASR_MODEL=iic/SenseVoiceSmall`
+- `RETRIEVAL_STRATEGY=hybrid`
+- `RETRIEVAL_RERANKER_MODEL=BAAI/bge-reranker-base`
 - `FUNASR_STREAMING_MODEL=paraformer-zh-streaming`
 - `FUNASR_STREAMING_CHUNK_SIZE=0,10,5`
 - `RETRIEVAL_CHUNK_SIZE=20`
@@ -122,6 +125,7 @@ Expected highlights:
 - `imports.transformers.ok: true`
 - `imports.gradio.ok: true`
 - `imports.chromadb.ok: true`
+- `imports.rank_bm25.ok: true`
 - `imports.sentence_transformers.ok: true`
 - `imports.langgraph.ok: true`
 
@@ -136,7 +140,7 @@ python -m pytest -q
 Expected:
 
 ```text
-58 passed
+59 passed
 ```
 
 ## Week 1 Quick Test
@@ -207,8 +211,27 @@ Detailed technology/industry analysis notes are in `reports\technology_industry_
 - LLM calls can be traced to Langfuse when credentials are configured
 - Meeting storage writes one summary record plus transcript chunks into Chroma automatically
 - History retrieval supports `chunk_type` and `meeting_id` metadata filters
+- Retrieval now defaults to `hybrid` mode: dense Chroma candidates + BM25 lexical candidates merged by RRF
+- A `BAAI/bge-reranker-base` CrossEncoder reranks the merged candidate pool before returning top hits
 - Action item extraction keeps a short reasoning summary and marks implicit tasks
 - Gradio shows a sentiment timeline chart and a speaker participation chart for the current run
+
+## Hybrid Retrieval Quick Test
+
+The default `MeetingVectorStore.query()` path now uses:
+
+1. dense embedding retrieval from Chroma
+2. lexical BM25 retrieval over the filtered candidate pool
+3. reciprocal-rank fusion merge
+4. CrossEncoder reranking
+
+The quickest validation is the retrieval test suite:
+
+```powershell
+python -m pytest tests/test_retrieval.py -q
+```
+
+Detailed hybrid retrieval notes are in `reports\hybrid_retrieval_documentation.md`.
 
 ## Streaming MVP Quick Test
 

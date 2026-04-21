@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from meeting_ai.config import get_settings
 from meeting_ai.retrieval import MeetingVectorStore
 from meeting_ai.schemas import SummaryResult, TranscriptResult, TranscriptSegment
 
@@ -8,10 +9,46 @@ class FakeEmbedder:
     def encode_texts(self, texts, task="passage"):
         vectors = []
         for text in texts:
-            launch = 1.0 if "launch" in text.lower() else 0.0
-            budget = 1.0 if "budget" in text.lower() else 0.0
-            vectors.append([launch, budget])
+            normalized = text.lower()
+            launch = 1.0 if "launch" in normalized else 0.0
+            budget = 1.0 if "budget" in normalized else 0.0
+            timeline = 1.0 if "timeline" in normalized else 0.0
+            vectors.append([launch, budget, timeline])
         return vectors
+
+
+class FakeLexicalRetriever:
+    def score_documents(self, query, documents):
+        query_lower = query.lower()
+        scores = []
+        for document in documents:
+            document_lower = document.lower()
+            score = 0.0
+            if "launch" in query_lower and "launch" in document_lower:
+                score += 3.0
+            if "budget" in query_lower and "budget" in document_lower:
+                score += 3.0
+            if "timeline" in query_lower and "timeline" in document_lower:
+                score += 3.0
+            scores.append(score)
+        return scores
+
+
+class FakeReranker:
+    def score_pairs(self, query, documents):
+        query_lower = query.lower()
+        scores = []
+        for document in documents:
+            document_lower = document.lower()
+            score = 0.1
+            if "launch" in query_lower and "launch" in document_lower:
+                score += 0.7
+            if "budget" in query_lower and "budget" in document_lower:
+                score += 0.7
+            if "timeline" in query_lower and "timeline" in document_lower:
+                score += 0.7
+            scores.append(score)
+        return scores
 
 
 class FakeCollection:
@@ -52,9 +89,18 @@ class FakeCollection:
             reverse=True,
         )[:n_results]
         return {
+            "ids": [[item["id"] for item in ranked]],
             "documents": [[item["document"] for item in ranked]],
             "metadatas": [[item["metadata"] for item in ranked]],
             "distances": [[0.0 for _ in ranked]],
+        }
+
+    def get(self, where=None, include=None):
+        filtered = [item for item in self.items if self._matches_where(item, where)]
+        return {
+            "ids": [item["id"] for item in filtered],
+            "documents": [item["document"] for item in filtered],
+            "metadatas": [item["metadata"] for item in filtered],
         }
 
 
@@ -71,9 +117,28 @@ def build_transcript() -> TranscriptResult:
     )
 
 
-def test_vector_store_adds_summary_document() -> None:
+def build_store(collection: FakeCollection | None = None) -> MeetingVectorStore:
+    settings = get_settings().model_copy(
+        update={
+            "retrieval_strategy": "hybrid",
+            "retrieval_enable_reranker": True,
+            "retrieval_dense_candidate_k": 8,
+            "retrieval_sparse_candidate_k": 8,
+            "retrieval_reranker_candidate_k": 8,
+        }
+    )
+    return MeetingVectorStore(
+        settings=settings,
+        collection=collection or FakeCollection(),
+        embedder=FakeEmbedder(),
+        lexical_retriever=FakeLexicalRetriever(),
+        reranker=FakeReranker(),
+    )
+
+
+def test_vector_store_adds_summary_and_transcript_chunks() -> None:
     collection = FakeCollection()
-    store = MeetingVectorStore(collection=collection, embedder=FakeEmbedder())
+    store = build_store(collection)
 
     meeting_id = store.add_summary(
         summary=SummaryResult(topics=["Launch"], decisions=["Ship"], follow_ups=["Share budget"]),
@@ -90,11 +155,11 @@ def test_vector_store_adds_summary_document() -> None:
     assert collection.items[1]["metadata"]["chunk_index"] == 0
 
 
-def test_vector_store_queries_ranked_results() -> None:
+def test_vector_store_defaults_to_hybrid_retrieval_with_reranker_scores() -> None:
     collection = FakeCollection()
-    store = MeetingVectorStore(collection=collection, embedder=FakeEmbedder())
+    store = build_store(collection)
     store.add_summary(
-        summary=SummaryResult(topics=["Launch"], decisions=["Ship"], follow_ups=[]),
+        summary=SummaryResult(topics=["Launch"], decisions=["Ship launch"], follow_ups=[]),
         transcript=build_transcript(),
         meeting_id="launch-meeting",
     )
@@ -107,11 +172,14 @@ def test_vector_store_queries_ranked_results() -> None:
 
     assert len(results) == 1
     assert results[0].meeting_id == "launch-meeting"
+    assert results[0].metadata["retrieval_strategy"] == "hybrid"
+    assert results[0].metadata["reranker_score"] is not None
+    assert set(results[0].metadata["retrieval_sources"]) == {"dense", "lexical"}
 
 
 def test_vector_store_queries_can_filter_by_chunk_type_and_meeting_id() -> None:
     collection = FakeCollection()
-    store = MeetingVectorStore(collection=collection, embedder=FakeEmbedder())
+    store = build_store(collection)
     store.add_summary(
         summary=SummaryResult(topics=["Launch"], decisions=["Ship"], follow_ups=[]),
         transcript=build_transcript(),
@@ -141,3 +209,20 @@ def test_vector_store_queries_can_filter_by_chunk_type_and_meeting_id() -> None:
     assert len(summary_results) == 1
     assert summary_results[0].metadata["chunk_type"] == "summary"
     assert summary_results[0].meeting_id == "budget-meeting"
+
+
+def test_vector_store_can_disable_reranker_and_use_dense_only() -> None:
+    collection = FakeCollection()
+    store = build_store(collection)
+    store.add_summary(
+        summary=SummaryResult(topics=["Timeline"], decisions=["Keep the launch timeline"], follow_ups=[]),
+        meeting_id="timeline-meeting",
+    )
+
+    results = store.query("What is the launch timeline?", top_k=1, strategy="dense", use_reranker=False)
+
+    assert len(results) == 1
+    assert results[0].meeting_id == "timeline-meeting"
+    assert results[0].metadata["retrieval_strategy"] == "dense"
+    assert results[0].metadata["reranker_score"] is None
+    assert results[0].metadata["dense_score"] == 1.0

@@ -41,6 +41,7 @@ def main() -> None:
             "transformers": import_status("transformers"),
             "gradio": import_status("gradio"),
             "chromadb": import_status("chromadb"),
+            "rank_bm25": import_status("rank_bm25"),
             "sentence_transformers": import_status("sentence_transformers"),
             "langgraph": import_status("langgraph"),
         },
