@@ -6,16 +6,16 @@
 <text x="820" y="108" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#111827">Latency (s)</text>
 <text x="48" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">transformer</text>
 <rect x="360" y="130" width="320" height="32" rx="12" fill="#e5e7eb"/>
-<rect x="360" y="130" width="216" height="32" rx="12" fill="#16a34a"/>
-<text x="592" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.677</text>
+<rect x="360" y="130" width="94" height="32" rx="12" fill="#16a34a"/>
+<text x="470" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.296</text>
 <rect x="820" y="130" width="320" height="32" rx="12" fill="#e5e7eb"/>
-<rect x="820" y="130" width="11" height="32" rx="12" fill="#dc2626"/>
-<text x="847" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.418</text>
+<rect x="820" y="130" width="5" height="32" rx="12" fill="#dc2626"/>
+<text x="841" y="152" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">0.368</text>
 <text x="48" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="600" fill="#111827">llm_deepseek</text>
 <rect x="360" y="200" width="320" height="32" rx="12" fill="#e5e7eb"/>
 <rect x="360" y="200" width="320" height="32" rx="12" fill="#16a34a"/>
 <text x="610" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">1.000</text>
 <rect x="820" y="200" width="320" height="32" rx="12" fill="#e5e7eb"/>
 <rect x="820" y="200" width="320" height="32" rx="12" fill="#dc2626"/>
-<text x="1070" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">11.267</text>
+<text x="1070" y="222" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" fill="#111827">23.336</text>
 </svg>

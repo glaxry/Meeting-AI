@@ -130,6 +130,14 @@ def _render_overview_svg(path: Path, week35_metrics: dict[str, Any], architectur
         _svg_text(["Meeting AI Final Snapshot"], 48, 44, size=30, weight=700),
         _svg_text(["This board condenses the core numbers used in the final report and demo."], 48, 74, size=16),
     ]
+    sentiment_dataset = sentiment_eval.get("dataset", {})
+    sentiment_sample_count = int(sentiment_dataset.get("sample_count", sentiment_eval["routes"]["transformer"].get("sample_count", 0)) or 0)
+    llm_warnings = sentiment_eval["routes"].get("llm_deepseek", {}).get("warnings", [])
+    llm_summary_line = (
+        "LLM hit benchmark ceiling; keep as diagnostic only"
+        if llm_warnings
+        else f"LLM acc/F1: {sentiment_eval['routes']['llm_deepseek']['accuracy']:.3f} / {sentiment_eval['routes']['llm_deepseek']['macro_f1']:.3f}"
+    )
     cards = [
         (48, 112, 390, 180, "#dbeafe", "End-to-End Runtime", [
             f"Audio duration: {week35_metrics['runtime']['audio_duration_seconds']:.3f}s",
@@ -144,9 +152,10 @@ def _render_overview_svg(path: Path, week35_metrics: dict[str, Any], architectur
             f"Failure isolation: {architecture_eval['error_isolation_demo']['parallel_completed_agents']} vs {architecture_eval['error_isolation_demo']['serial_completed_agents']} agents",
         ]),
         (920, 112, 390, 180, "#fee2e2", "Sentiment Trade-off", [
+            f"Benchmark size: {sentiment_sample_count} items",
             f"Transformer acc/F1: {sentiment_eval['routes']['transformer']['accuracy']:.3f} / {sentiment_eval['routes']['transformer']['macro_f1']:.3f}",
             f"Transformer latency: {sentiment_eval['routes']['transformer']['latency_seconds']:.3f}s",
-            f"LLM acc/F1: {sentiment_eval['routes']['llm_deepseek']['accuracy']:.3f} / {sentiment_eval['routes']['llm_deepseek']['macro_f1']:.3f}",
+            llm_summary_line,
             f"LLM latency: {sentiment_eval['routes']['llm_deepseek']['latency_seconds']:.3f}s",
         ]),
         (48, 330, 1262, 380, "#ffffff", "Demo Narrative", [
@@ -180,6 +189,10 @@ def write_final_report(
     architecture_failure = architecture_eval["error_isolation_demo"]
     sentiment_transformer = sentiment_eval["routes"]["transformer"]
     sentiment_llm = sentiment_eval["routes"]["llm_deepseek"]
+    sentiment_dataset = sentiment_eval.get("dataset", {})
+    sentiment_sample_count = int(sentiment_dataset.get("sample_count", sentiment_transformer.get("sample_count", 0)) or 0)
+    sentiment_warnings = sentiment_eval.get("warnings", [])
+    llm_warnings = sentiment_llm.get("warnings", [])
 
     lines = [
         "# Smart Meeting Assistant: Final Project Report",
@@ -231,7 +244,14 @@ def write_final_report(
         "",
         "![Sentiment evaluation](assets/week5/sentiment_compare.svg)",
         "",
-        f"On the 20-item manually labeled set, the transformer route achieved accuracy {sentiment_transformer['accuracy']:.3f}, macro F1 {sentiment_transformer['macro_f1']:.3f}, and latency {sentiment_transformer['latency_seconds']:.3f}s. The DeepSeek LLM route achieved accuracy {sentiment_llm['accuracy']:.3f}, macro F1 {sentiment_llm['macro_f1']:.3f}, and latency {sentiment_llm['latency_seconds']:.3f}s.",
+        f"On the current {sentiment_sample_count}-item sentiment benchmark, the transformer route achieved accuracy {sentiment_transformer['accuracy']:.3f}, macro F1 {sentiment_transformer['macro_f1']:.3f}, and latency {sentiment_transformer['latency_seconds']:.3f}s.",
+        (
+            f"The DeepSeek LLM route returned accuracy {sentiment_llm['accuracy']:.3f}, macro F1 {sentiment_llm['macro_f1']:.3f}, and latency {sentiment_llm['latency_seconds']:.3f}s, "
+            "but this route saturated the current benchmark and is treated as a ceiling-effect diagnostic rather than a headline production claim."
+            if llm_warnings
+            else f"The DeepSeek LLM route achieved accuracy {sentiment_llm['accuracy']:.3f}, macro F1 {sentiment_llm['macro_f1']:.3f}, and latency {sentiment_llm['latency_seconds']:.3f}s."
+        ),
+        *[f"Benchmark note: {warning}" for warning in sentiment_warnings],
         "",
         "### 4.5 End-to-End Demo Evidence",
         "",

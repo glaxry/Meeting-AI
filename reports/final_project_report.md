@@ -47,7 +47,10 @@ Using the first 80 segments from the real `test.wav` transcript, the parallel or
 
 ![Sentiment evaluation](assets/week5/sentiment_compare.svg)
 
-On the 20-item manually labeled set, the transformer route achieved accuracy 0.750, macro F1 0.677, and latency 0.418s. The DeepSeek LLM route achieved accuracy 1.000, macro F1 1.000, and latency 11.267s.
+On the current 60-item sentiment benchmark, the transformer route achieved accuracy 0.317, macro F1 0.296, and latency 0.368s.
+The DeepSeek LLM route returned accuracy 1.000, macro F1 1.000, and latency 23.336s, but this route saturated the current benchmark and is treated as a ceiling-effect diagnostic rather than a headline production claim.
+Benchmark note: Benchmark is still small; treat sentiment metrics as preliminary and inspect confidence intervals.
+Benchmark note: Benchmark is single-language only; it should not be used to claim multilingual robustness.
 
 ### 4.5 End-to-End Demo Evidence
 

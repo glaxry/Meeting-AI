@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from meeting_ai.evaluation import (
     accuracy_score,
+    bootstrap_confidence_interval,
     compute_error_rates,
     compute_rouge,
     confusion_matrix,
@@ -9,6 +10,7 @@ from meeting_ai.evaluation import (
     precision_recall_f1,
     strip_speaker_labels,
     summary_to_eval_text,
+    value_counts,
 )
 from meeting_ai.schemas import SummaryResult
 
@@ -60,3 +62,24 @@ def test_classification_metrics_cover_macro_scores() -> None:
     assert macro_f1_score(labels, predictions, label_space) == 0.555556
     matrix = confusion_matrix(labels, predictions, label_space)
     assert matrix["neutral"]["disagreement"] == 1
+
+
+def test_value_counts_and_bootstrap_interval_are_stable() -> None:
+    labels = ["agreement", "neutral", "neutral", "disagreement"]
+    predictions = ["agreement", "disagreement", "neutral", "disagreement"]
+    label_space = ["agreement", "disagreement", "neutral"]
+
+    assert value_counts(labels) == {"agreement": 1, "neutral": 2, "disagreement": 1}
+
+    interval = bootstrap_confidence_interval(
+        labels,
+        predictions,
+        lambda sample_labels, sample_predictions: macro_f1_score(sample_labels, sample_predictions, label_space),
+        iterations=200,
+        seed=7,
+    )
+
+    assert interval is not None
+    assert interval["confidence"] == 0.95
+    assert interval["iterations"] == 200
+    assert interval["lower"] <= interval["point_estimate"] <= interval["upper"]

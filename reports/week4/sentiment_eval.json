@@ -1,5 +1,5 @@
 {
-  "manifest": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\eval\\sentiment_labels.sample.jsonl",
+  "manifest": "D:\\Autumn Campus Recruitmen\\Meeting AI\\data\\eval\\sentiment_labels.benchmark_v2.jsonl",
   "label_space": [
     "agreement",
     "disagreement",
@@ -7,123 +7,186 @@
     "tension",
     "neutral"
   ],
+  "dataset": {
+    "sample_count": 60,
+    "label_distribution": {
+      "agreement": 12,
+      "disagreement": 12,
+      "hesitation": 12,
+      "tension": 12,
+      "neutral": 12
+    },
+    "language_distribution": {
+      "en": 60
+    },
+    "difficulty_distribution": {
+      "benchmark_v2": 60
+    }
+  },
+  "warnings": [
+    "Benchmark is still small; treat sentiment metrics as preliminary and inspect confidence intervals.",
+    "Benchmark is single-language only; it should not be used to claim multilingual robustness."
+  ],
   "routes": {
     "transformer": {
       "route": "transformer",
-      "sample_count": 20,
-      "accuracy": 0.75,
-      "macro_f1": 0.676883,
+      "sample_count": 60,
+      "label_distribution": {
+        "agreement": 12,
+        "disagreement": 12,
+        "hesitation": 12,
+        "tension": 12,
+        "neutral": 12
+      },
+      "accuracy": 0.316667,
+      "accuracy_ci": {
+        "lower": 0.2,
+        "upper": 0.433333,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "point_estimate": 0.316667
+      },
+      "macro_f1": 0.295767,
+      "macro_f1_ci": {
+        "lower": 0.168718,
+        "upper": 0.395902,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "point_estimate": 0.295767
+      },
       "per_label": {
         "agreement": {
-          "precision": 0.571429,
-          "recall": 1.0,
-          "f1": 0.727273,
-          "support": 4
+          "precision": 0.344828,
+          "recall": 0.833333,
+          "f1": 0.487805,
+          "support": 12
         },
         "disagreement": {
-          "precision": 0.666667,
-          "recall": 1.0,
-          "f1": 0.8,
-          "support": 4
+          "precision": 0.272727,
+          "recall": 0.25,
+          "f1": 0.26087,
+          "support": 12
         },
         "hesitation": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
-          "support": 4
+          "recall": 0.166667,
+          "f1": 0.285714,
+          "support": 12
         },
         "tension": {
-          "precision": 1.0,
-          "recall": 0.75,
-          "f1": 0.857143,
-          "support": 4
+          "precision": 0.666667,
+          "recall": 0.333333,
+          "f1": 0.444444,
+          "support": 12
         },
         "neutral": {
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "support": 4
+          "support": 12
         }
       },
       "confusion_matrix": {
         "agreement": {
-          "agreement": 4,
-          "disagreement": 0,
+          "agreement": 10,
+          "disagreement": 1,
           "hesitation": 0,
           "tension": 0,
-          "neutral": 0
+          "neutral": 1
         },
         "disagreement": {
-          "agreement": 0,
-          "disagreement": 4,
+          "agreement": 1,
+          "disagreement": 3,
           "hesitation": 0,
-          "tension": 0,
-          "neutral": 0
+          "tension": 2,
+          "neutral": 6
         },
         "hesitation": {
-          "agreement": 0,
-          "disagreement": 0,
-          "hesitation": 4,
+          "agreement": 5,
+          "disagreement": 2,
+          "hesitation": 2,
           "tension": 0,
-          "neutral": 0
+          "neutral": 3
         },
         "tension": {
-          "agreement": 0,
-          "disagreement": 1,
+          "agreement": 3,
+          "disagreement": 3,
           "hesitation": 0,
-          "tension": 3,
-          "neutral": 0
+          "tension": 4,
+          "neutral": 2
         },
         "neutral": {
-          "agreement": 3,
-          "disagreement": 1,
+          "agreement": 10,
+          "disagreement": 2,
           "hesitation": 0,
           "tension": 0,
           "neutral": 0
         }
       },
-      "latency_seconds": 0.418
+      "latency_seconds": 0.368,
+      "warnings": []
     },
     "llm_deepseek": {
       "route": "llm_deepseek",
-      "sample_count": 20,
+      "sample_count": 60,
+      "label_distribution": {
+        "agreement": 12,
+        "disagreement": 12,
+        "hesitation": 12,
+        "tension": 12,
+        "neutral": 12
+      },
       "accuracy": 1.0,
+      "accuracy_ci": {
+        "lower": 1.0,
+        "upper": 1.0,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "point_estimate": 1.0
+      },
       "macro_f1": 1.0,
+      "macro_f1_ci": {
+        "lower": 1.0,
+        "upper": 1.0,
+        "confidence": 0.95,
+        "iterations": 2000,
+        "point_estimate": 1.0
+      },
       "per_label": {
         "agreement": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 4
+          "support": 12
         },
         "disagreement": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 4
+          "support": 12
         },
         "hesitation": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 4
+          "support": 12
         },
         "tension": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 4
+          "support": 12
         },
         "neutral": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 4
+          "support": 12
         }
       },
       "confusion_matrix": {
         "agreement": {
-          "agreement": 4,
+          "agreement": 12,
           "disagreement": 0,
           "hesitation": 0,
           "tension": 0,
@@ -131,7 +194,7 @@
         },
         "disagreement": {
           "agreement": 0,
-          "disagreement": 4,
+          "disagreement": 12,
           "hesitation": 0,
           "tension": 0,
           "neutral": 0
@@ -139,7 +202,7 @@
         "hesitation": {
           "agreement": 0,
           "disagreement": 0,
-          "hesitation": 4,
+          "hesitation": 12,
           "tension": 0,
           "neutral": 0
         },
@@ -147,7 +210,7 @@
           "agreement": 0,
           "disagreement": 0,
           "hesitation": 0,
-          "tension": 4,
+          "tension": 12,
           "neutral": 0
         },
         "neutral": {
@@ -155,10 +218,13 @@
           "disagreement": 0,
           "hesitation": 0,
           "tension": 0,
-          "neutral": 4
+          "neutral": 12
         }
       },
-      "latency_seconds": 11.267
+      "latency_seconds": 23.336,
+      "warnings": [
+        "llm_deepseek saturated the current benchmark; treat this result as a ceiling-effect signal instead of a production-grade claim."
+      ]
     }
   }
 }

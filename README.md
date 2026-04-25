@@ -323,8 +323,14 @@ Run the four Week 4 experiment scripts:
 python scripts/week4_asr_eval.py --manifest .\data\eval\asr_manifest.sample.jsonl --output .\reports\week4\asr_eval.json
 python scripts/week4_summary_eval.py --manifest .\data\eval\summary_manifest.sample.jsonl --provider deepseek --judge-provider deepseek --output .\reports\week4\summary_eval.json
 python scripts/week4_architecture_eval.py --workflow-json .\data\outputs\week3_test_run.json --provider deepseek --target-language en --sentiment-route transformer --max-segments 80 --output .\reports\week4\architecture_eval.json
-python scripts/week4_sentiment_eval.py --manifest .\data\eval\sentiment_labels.sample.jsonl --provider deepseek --output .\reports\week4\sentiment_eval.json
+python scripts/week4_sentiment_eval.py --manifest .\data\eval\sentiment_labels.benchmark_v2.jsonl --provider deepseek --output .\reports\week4\sentiment_eval.json
 ```
+
+Sentiment evaluation notes:
+
+- the default benchmark is now `60` balanced meeting-style utterances, not the old `20`-item smoke set
+- `reports\week4\sentiment_eval.json` includes bootstrap confidence intervals and dataset metadata
+- if a route hits `1.000 / 1.000`, the output now flags it as a `ceiling effect` instead of treating it as a resume-ready headline metric
 
 Generated files:
 

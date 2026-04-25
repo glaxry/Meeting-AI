@@ -72,18 +72,26 @@ This gives the repo a concrete Week 4 architecture result: parallel fan-out is f
 
 ## 4. Sentiment Comparison
 
-Manifest: `data/eval/sentiment_labels.sample.jsonl`
+Manifest: `data/eval/sentiment_labels.benchmark_v2.jsonl`
 
-| Route | Accuracy | Macro F1 | Latency (s) |
-| --- | --- | --- | --- |
-| `transformer` | 0.750000 | 0.676883 | 0.418 |
-| `llm_deepseek` | 1.000000 | 1.000000 | 11.267 |
+Benchmark profile:
+
+- `60` manually curated meeting-style utterances
+- balanced label distribution: `12` examples per class
+- single-language (`en`) benchmark
+- bootstrap confidence intervals included in `reports/week4/sentiment_eval.json`
+
+| Route | Accuracy | Accuracy 95% CI | Macro F1 | Macro F1 95% CI | Latency (s) |
+| --- | --- | --- | --- | --- | --- |
+| `transformer` | 0.316667 | 0.200000 - 0.433333 | 0.295767 | 0.168718 - 0.395902 | 0.368 |
+| `llm_deepseek` | 1.000000 | 1.000000 - 1.000000 | 1.000000 | 1.000000 - 1.000000 | 23.336 |
 
 Observations:
 
-- The transformer route is much faster but currently weak on `neutral` examples.
-- The LLM route is substantially slower but perfect on this 20-item manually labeled set.
-- The trade-off is now explicit in a reproducible output file, which is exactly what Week 4 needed.
+- The experiment is now harder than the original 20-item smoke set and reports confidence intervals plus dataset metadata.
+- The transformer route is much faster, but still struggles on subtle `neutral`, `disagreement`, and `hesitation` examples.
+- The DeepSeek LLM route still saturates the current benchmark, so the repo now treats that result as a `ceiling effect` warning rather than a resume-safe production claim.
+- This means the sentiment harness is useful for regression tracking and error analysis, but the current benchmark should not be used to claim real-world multilingual generalization.
 
 ## Next Steps
 

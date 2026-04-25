@@ -16,10 +16,11 @@
 <text x="506" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Failure isolation: 3 vs 1 agents</text>
 <rect x="920" y="112" width="390" height="180" rx="24" fill="#fee2e2" stroke="#cbd5e1" stroke-width="2"/>
 <text x="942" y="150" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">Sentiment Trade-off</text>
-<text x="942" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer acc/F1: 0.750 / 0.677</text>
-<text x="942" y="218" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer latency: 0.418s</text>
-<text x="942" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM acc/F1: 1.000 / 1.000</text>
-<text x="942" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM latency: 11.267s</text>
+<text x="942" y="190" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Benchmark size: 60 items</text>
+<text x="942" y="218" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer acc/F1: 0.317 / 0.296</text>
+<text x="942" y="246" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">Transformer latency: 0.368s</text>
+<text x="942" y="274" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM hit benchmark ceiling; keep as diagnostic only</text>
+<text x="942" y="302" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">LLM latency: 23.336s</text>
 <rect x="48" y="330" width="1262" height="380" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
 <text x="70" y="368" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#111827">Demo Narrative</text>
 <text x="70" y="408" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="18" font-weight="400" fill="#111827">1. Upload `test.wav` in Gradio and show the transcript tab first.</text>

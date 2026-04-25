@@ -1,0 +1,60 @@
+{"id":"b001","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"I'm aligned with moving the pilot to next Tuesday.","label":"agreement"}
+{"id":"b002","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"No objection from finance on the revised discount.","label":"agreement"}
+{"id":"b003","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"Let's lock option B; that works on my side.","label":"agreement"}
+{"id":"b004","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"We can proceed with the vendor shortlist as proposed.","label":"agreement"}
+{"id":"b005","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"The updated wording looks fine to me.","label":"agreement"}
+{"id":"b006","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"I'm comfortable sending this build to UAT.","label":"agreement"}
+{"id":"b007","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"The rollback plan covers my concerns, so I'm on board.","label":"agreement"}
+{"id":"b008","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"From the account side, we can move ahead with this version.","label":"agreement"}
+{"id":"b009","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"I can live with the cutover window you've suggested.","label":"agreement"}
+{"id":"b010","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"The revised cap is acceptable on our end.","label":"agreement"}
+{"id":"b011","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"That approach closes the gaps I raised earlier.","label":"agreement"}
+{"id":"b012","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"If the rest of the group is set on this path, I'm supportive.","label":"agreement"}
+{"id":"b013","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"I still can't approve a Friday release with open Sev-1 alerts.","label":"disagreement"}
+{"id":"b014","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"That proposal misses the root issue, so I'm against adopting it.","label":"disagreement"}
+{"id":"b015","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"I won't sign off on the contract in its current form.","label":"disagreement"}
+{"id":"b016","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"Shipping now would be the wrong call.","label":"disagreement"}
+{"id":"b017","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"I'm not backing the price cut at that level.","label":"disagreement"}
+{"id":"b018","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"This timeline does not work for the migration team.","label":"disagreement"}
+{"id":"b019","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"I understand the goal, but I don't support removing QA from the gate.","label":"disagreement"}
+{"id":"b020","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"We should drop option C; it creates more risk than value.","label":"disagreement"}
+{"id":"b021","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"That direction doesn't solve the customer complaint we are seeing.","label":"disagreement"}
+{"id":"b022","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"I'm pushing back on merging this before the dependency fix lands.","label":"disagreement"}
+{"id":"b023","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"This spend level is outside what I can support today.","label":"disagreement"}
+{"id":"b024","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"I would not recommend proceeding with the current runbook.","label":"disagreement"}
+{"id":"b025","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"I need to verify the logs before I commit to that.","label":"hesitation"}
+{"id":"b026","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"We could probably finish today, but I want to confirm with infra first.","label":"hesitation"}
+{"id":"b027","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"Let's hold the announcement until we hear back from legal.","label":"hesitation"}
+{"id":"b028","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"I'm leaning toward option A, though I still need one more check.","label":"hesitation"}
+{"id":"b029","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"We may be ready tomorrow if the dataset finishes syncing.","label":"hesitation"}
+{"id":"b030","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"I'd rather review the customer notes once more before deciding.","label":"hesitation"}
+{"id":"b031","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"Let's revisit after the dry run; I'm not ready to commit yet.","label":"hesitation"}
+{"id":"b032","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"I can tentatively take that item, assuming support clears the blocker.","label":"hesitation"}
+{"id":"b033","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"We might keep the scope as is, but I want to hear from the client first.","label":"hesitation"}
+{"id":"b034","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"There's a decent chance this works, although I'd like one more rehearsal.","label":"hesitation"}
+{"id":"b035","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"I'm not fully convinced either way until I see the last test cycle.","label":"hesitation"}
+{"id":"b036","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"We can come back with an answer after the privacy review wraps up.","label":"hesitation"}
+{"id":"b037","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"If billing slips again today, the client will escalate to the VP.","label":"tension"}
+{"id":"b038","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"We are out of buffer and support tickets are still climbing.","label":"tension"}
+{"id":"b039","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"The board review is tomorrow morning, and the numbers still don't reconcile.","label":"tension"}
+{"id":"b040","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"Another miss here puts the renewal at risk.","label":"tension"}
+{"id":"b041","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"The deployment window closes in an hour and we are still blocked.","label":"tension"}
+{"id":"b042","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"This incident is spreading faster than the team can contain it.","label":"tension"}
+{"id":"b043","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"We cannot afford another rollback this quarter.","label":"tension"}
+{"id":"b044","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"The legal issue is now on the executive tracker.","label":"tension"}
+{"id":"b045","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"If the forecast misses again, funding for phase two is in danger.","label":"tension"}
+{"id":"b046","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"We're carrying too much production risk into tonight's change window.","label":"tension"}
+{"id":"b047","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"Everyone is waiting for the fix, and the pressure is rising by the hour.","label":"tension"}
+{"id":"b048","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"The compliance gap is now visible to leadership.","label":"tension"}
+{"id":"b049","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"The revised roadmap is on page twelve of the deck.","label":"neutral"}
+{"id":"b050","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"We compared three agency proposals in today's review.","label":"neutral"}
+{"id":"b051","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"Ops will send the notes after lunch.","label":"neutral"}
+{"id":"b052","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"The API change only affects the reporting endpoint.","label":"neutral"}
+{"id":"b053","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"Last quarter's churn number is listed in the appendix.","label":"neutral"}
+{"id":"b054","speaker":"LEGAL","language":"en","difficulty":"benchmark_v2","text":"The workshop starts at ten and ends at eleven thirty.","label":"neutral"}
+{"id":"b055","speaker":"PM","language":"en","difficulty":"benchmark_v2","text":"Today's agenda has four items and a short demo at the end.","label":"neutral"}
+{"id":"b056","speaker":"OPS","language":"en","difficulty":"benchmark_v2","text":"The procurement file is already in the shared folder.","label":"neutral"}
+{"id":"b057","speaker":"ENG","language":"en","difficulty":"benchmark_v2","text":"We logged six open items from the last steering meeting.","label":"neutral"}
+{"id":"b058","speaker":"QA","language":"en","difficulty":"benchmark_v2","text":"The patch only touches the admin export path.","label":"neutral"}
+{"id":"b059","speaker":"FIN","language":"en","difficulty":"benchmark_v2","text":"The second tab shows the updated cost breakdown.","label":"neutral"}
+{"id":"b060","speaker":"SALES","language":"en","difficulty":"benchmark_v2","text":"Customer feedback from March is summarized in the shared notes.","label":"neutral"}

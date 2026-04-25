@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 from pathlib import Path
 from statistics import mean
 from typing import Any, Iterable, Sequence
@@ -115,6 +116,48 @@ def macro_f1_score(labels: Sequence[str], predictions: Sequence[str], label_spac
     if not rows:
         return 0.0
     return round(mean(row["f1"] for row in rows.values()), 6)
+
+
+def value_counts(values: Sequence[str]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for value in values:
+        counts[value] = counts.get(value, 0) + 1
+    return counts
+
+
+def bootstrap_confidence_interval(
+    labels: Sequence[str],
+    predictions: Sequence[str],
+    metric_fn,
+    *,
+    iterations: int = 2000,
+    confidence: float = 0.95,
+    seed: int = 42,
+) -> dict[str, float] | None:
+    if not labels or not predictions or len(labels) != len(predictions):
+        return None
+
+    sample_size = len(labels)
+    rng = random.Random(seed)
+    scores: list[float] = []
+    for _ in range(max(iterations, 1)):
+        indices = [rng.randrange(sample_size) for _ in range(sample_size)]
+        sample_labels = [labels[index] for index in indices]
+        sample_predictions = [predictions[index] for index in indices]
+        scores.append(float(metric_fn(sample_labels, sample_predictions)))
+
+    scores.sort()
+    alpha = max(0.0, min(1.0, 1.0 - confidence))
+    lower_index = int((alpha / 2) * (len(scores) - 1))
+    upper_index = int((1 - alpha / 2) * (len(scores) - 1))
+    midpoint = round(float(metric_fn(labels, predictions)), 6)
+    return {
+        "lower": round(scores[lower_index], 6),
+        "upper": round(scores[upper_index], 6),
+        "confidence": round(confidence, 3),
+        "iterations": int(iterations),
+        "point_estimate": midpoint,
+    }
 
 
 def confusion_matrix(labels: Sequence[str], predictions: Sequence[str], label_space: Sequence[str]) -> dict[str, dict[str, int]]:
